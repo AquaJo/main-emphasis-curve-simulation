@@ -17,8 +17,8 @@ function load(emphasisRelation) {
   drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], "CIRCLE", [50, 205, 50])
 
   // zeichne nun gegebene Koordinaten mit Verbindungslinien für P und Q
-  drawCoords(data.xP, data.yP, "CIRCLE", [63, 136, 143]);
-  drawCoords(data.xQ, data.yQ, "RECT", [255, 127, 80]);
+  drawCoords(data.xP, data.yP, "CIRCLE", [63, 136, 143]/*, [data.xQ,data.yQ]*/); // letzter Parameter : andere Koordinaten mit überliefern um Verbindungslinien zwischendrinnen zu machen --> in einem Array aufgrund der Parameteranzahl
+  drawCoords(data.xQ, data.yQ, "RECT", [255, 127, 80]); // letzer Parameter darf undefined bleiben
 }
 
 
@@ -57,7 +57,7 @@ function getCoordsInRelation(collection1, collection2, relation) {
   newCollection.push(allX, allY); // neue Kords hinzufügen zu return-list
   return newCollection;
 }
-function drawCoords(x, y, shape, color) {
+function drawCoords(x, y, shape, color, othersCords) {
   let w = 6; // w === Weite
   let a = 100; // Streckung bestimmen
   let offsetX = 60; // offsets für gleichen Abstand vom Rand
@@ -68,7 +68,6 @@ function drawCoords(x, y, shape, color) {
   for (let i = 0; i < x.length; ++i) {
     let newX = a * x[i] + offsetX; // offset etc anwenden
     let newY = -a * y[i] + offsetY; // - a , da y-koord-achse gespiegelt ist
-
     if (i != 0) {
       // Strecken einzeichnen
       // alle Strecken einzeichnen, nach i == 0
@@ -80,6 +79,15 @@ function drawCoords(x, y, shape, color) {
     lastX = newX; // copy machen von neuen xy - koords um danach Strecken zeichnen zu können
     lastY = newY;
 
+    if (othersCords) { // Verbindungslinien zwischen den unterschiedlichen Kurven entstehend aus P und Q Koordinaten
+      // muss am Anfang stehen, damit es in den Hintergrund rückt
+      console.log("y");
+      stroke(255, 255, 255);
+      let offsetY = a * Math.max(...othersCords[1]) + 60; // selbiges Prozedere, bloß für die anderen y-Koordinaten
+      line(newX, newY, a * othersCords[0][i] + offsetX,-a * othersCords[1][i] + offsetY);
+      noStroke();
+    }
+
     if (shape === "CIRCLE") {
       // Punktungen einzeichnen
       ellipseMode(CENTER);
@@ -88,6 +96,8 @@ function drawCoords(x, y, shape, color) {
       rectMode(CENTER);
       rect(newX, newY, w, w);
     }
+
+    
   }
 }
 
