@@ -2,7 +2,7 @@
 function setup() {
   load(0.6);
 }
-function load(emphasisRelation) {
+function load(emphasisRelation, showConnectionLines) {
   createCanvas(1000, 430); // man könnte auch background neu setzen und überschreiben, wäre evt. effizienter --> wegen input range refreshs
 
   let unsplittedKoords =
@@ -13,25 +13,39 @@ function load(emphasisRelation) {
   let pCollection = [data.xP, data.yP];
   let qCollection = [data.xQ, data.yQ];
 
-  let mainEmphasisCoords = getCoordsInRelation(pCollection, qCollection, emphasisRelation);
-  drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], "CIRCLE", [50, 205, 50])
+  let mainEmphasisCoords = getCoordsInRelation(pCollection, qCollection, emphasisRelation, true);
+  console.log(mainEmphasisCoords[1]);
 
+
+  let yOffset = 424; // ist anders zu x nicht direkt vom Rand ausgehend, sondern vom tiefsten Punkt
+  let xOffset = 60;
+  let a = 100;
+  drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
   // zeichne nun gegebene Koordinaten mit Verbindungslinien für P und Q
-  drawCoords(data.xP, data.yP, "CIRCLE", [63, 136, 143]/*, [data.xQ,data.yQ]*/); // letzter Parameter : andere Koordinaten mit überliefern um Verbindungslinien zwischendrinnen zu machen --> in einem Array aufgrund der Parameteranzahl
-  drawCoords(data.xQ, data.yQ, "RECT", [255, 127, 80]); // letzer Parameter darf undefined bleiben
+  qCollection.push([a, xOffset, yOffset]); // als 3. Item - Skaling-Infos mitschicken von dem Verbindungsgraphen
+  drawCoords(data.xP, data.yP, a, xOffset, yOffset,"CIRCLE", [63, 136, 143],showConnectionLines? qCollection : undefined);
+  drawCoords(data.xQ, data.yQ, a, xOffset, yOffset, "RECT", [255, 127, 80]);
 }
 
-
+let showWite = true;
 // auf input change hören
 let inputRange = document.getElementById("inputByMe");
 inputRange.value = "0.6";
 inputRange.addEventListener('input', (event) => {
   let val = inputRange.value;
   document.getElementById("rangeCounter").innerHTML = val;
-  load(val);
+  load(val,showWite);
 }); // input als id wurde von p5js reserviert / blockiert
+document.addEventListener('mouseup', (event) => { // feuert jedes mal aber merkt man nicht ..
+  load(inputRange.value, false);
+});
 
-function getCoordsInRelation(collection1, collection2, relation) {
+// auf den switch-Input hören
+let inputSwitch = document.getElementById("checkcross");
+inputSwitch.addEventListener('input', (event) => {
+  showWite = !showWite;
+});
+function getCoordsInRelation(collection1, collection2, relation, fixed) {
   let newCollection = [];
   let allX = [];
   let allY = [];
@@ -46,22 +60,27 @@ function getCoordsInRelation(collection1, collection2, relation) {
 
     let newXC = x1x2 * relation; // relation hinzufügen zu Verschiebungen --> auf welchem Prozent der Stecke PQ soll sich die neue Koordinate befinden
     let newYC = y1y2 * relation; // ""
-
-    let newX = x1 + newXC; // berechnetes offset zu xy(1) Koordinaten hinzufügen
-    let newY = y1 + newYC; // ""
+    let newX;
+    let newY;
+    if (fixed) {
+      newX = x1 + newXC; // berechnetes offset zu xy(1) Koordinaten hinzufügen
+      newY = y1 + newYC; // ""
+    } else {
+      newX = x1 + newXC; // berechnetes offset zu xy(1) Koordinaten hinzufügen
+      newY = y1 + newYC; // ""
+    }
 
     allX.push(newX);
     allY.push(newY);
     // 
   }
-  newCollection.push(allX, allY); // neue Kords hinzufügen zu return-list
+  newCollection.push(allX); // neue Kords hinzufügen zu return-list
+  newCollection.push(allY);
   return newCollection;
 }
-function drawCoords(x, y, shape, color, othersCords) {
+function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
   let w = 6; // w === Weite
-  let a = 100; // Streckung bestimmen
-  let offsetX = 60; // offsets für gleichen Abstand vom Rand
-  let offsetY = a * Math.max(...y) + 60; // + a*MaxY --> da bei der Ellipsenerstellung - diese Höhe gegangen wird
+  //let a = 100; // Streckung bestimmen
   fill(color[0], color[1], color[2]);
   let lastX;
   let lastY;
@@ -81,10 +100,11 @@ function drawCoords(x, y, shape, color, othersCords) {
 
     if (othersCords) { // Verbindungslinien zwischen den unterschiedlichen Kurven entstehend aus P und Q Koordinaten
       // muss am Anfang stehen, damit es in den Hintergrund rückt
-      console.log("y");
       stroke(255, 255, 255);
-      let offsetY = a * Math.max(...othersCords[1]) + 60; // selbiges Prozedere, bloß für die anderen y-Koordinaten
-      line(newX, newY, a * othersCords[0][i] + offsetX,-a * othersCords[1][i] + offsetY);
+      let oA = othersCords[2][0]; // erst schön übersichtlich Daten aus Array übertragen
+      let oX = othersCords[2][1];
+      let oY = othersCords[2][2];
+      line(newX, newY, a * othersCords[0][i] + oX, -oA * othersCords[1][i] + oY);
       noStroke();
     }
 
@@ -97,7 +117,7 @@ function drawCoords(x, y, shape, color, othersCords) {
       rect(newX, newY, w, w);
     }
 
-    
+
   }
 }
 

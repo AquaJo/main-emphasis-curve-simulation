@@ -11,18 +11,28 @@ html, body {
   .footer {
     position:fixed;
   }
+  .footer.first {
+    margin-top:250px;
+  }
+  .footer.second {
+    margin-top:280px;
+  }
+  .footer.third {
+    margin-top:310px;
+  }
   .footer.P {
     color:rgb(63, 136, 143);
-    margin-top:360px;
-    margin-left:40px;
+    left:-20px;
   }
   .footer.Q {
     color:rgb(255, 127, 80);
-    margin-top:360px;
-    margin-left:150px;
+    left:80px;
   }
   .footer.emphasis {
     color:rgb(50, 205, 50);
-    margin-top:387px;
-    margin-left:40px;
+    left:-20px;
+  }
+  .footer.white {
+    color:white;
+    left:-20px;
   }
