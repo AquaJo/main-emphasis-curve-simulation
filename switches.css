@@ -1,5 +1,3 @@
-/* Danke Olivia Ng https://codepen.io/oliviale https://codepen.io/oliviale/pen/xxboXzo?editors=1100 für diesen (nicht 1:1 --> convertiert und teils weggelassen) css - Code für verschiedenste switches*/
-
 #inputCheckSpecified {
     background: rgb(220, 220, 220) !important;
 }
@@ -19,8 +17,7 @@
     top: 103px;
 }
 
-
-
+/* Danke Olivia Ng https://codepen.io/oliviale https://codepen.io/oliviale/pen/xxboXzo?editors=1100 für diesen (nicht 1:1 --> convertiert und teils weggelassen) css - Code für verschiedenste switches*/
 
 *:before,
 *:after {
@@ -729,7 +726,7 @@ label.toggle-item:before {
     border-bottom: 1px solid;
 }
 
-footer {
+footer { 
     margin-top: 1.5rem;
 }
 

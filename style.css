@@ -25,7 +25,7 @@ canvas {
   display: block;
 }
 
-.footer {
+.footer { /* zu spät aufgefallen, dass switches.css ebenfalls footer als class benutzt ...*/
   position: fixed;
 }
 
