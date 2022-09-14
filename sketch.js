@@ -34,9 +34,9 @@ inputRange.value = "0.6";
 inputRange.addEventListener('input', (event) => {
   let val = inputRange.value;
   document.getElementById("rangeCounter").innerHTML = val;
-  load(val, showWite);
+  load(val, showWite); // reload mit Relations-Wert & weiße Kurve einblenden / nicht einblenden
 }); // input als id wurde von p5js reserviert / blockiert
-document.addEventListener('mouseup', (event) => { // feuert jedes mal aber merkt man nicht ..
+document.addEventListener('mouseup', (event) => { // feuert jedes mal aber merkt man nicht .. --> weiße Kurve löschen
   load(inputRange.value, false);
 });
 
