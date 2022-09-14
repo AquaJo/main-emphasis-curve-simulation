@@ -1,29 +1,33 @@
 /* Danke Olivia Ng https://codepen.io/oliviale https://codepen.io/oliviale/pen/xxboXzo?editors=1100 für diesen (nicht 1:1 --> convertiert und teils weggelassen) css - Code für verschiedenste switches*/
 
 #inputCheckSpecified {
-    background:rgb(220,220,220) !important;
+    background: rgb(220, 220, 220) !important;
 }
+
 .checkcross {
-    position:fixed !important;
-    zoom:0.6;
-    left:1050px;
-    top:-73px;
+    position: fixed !important;
+    zoom: 0.6;
+    left: 1050px;
+    top: -73px;
 }
+
 #switchText {
-    position:relative;
-    color:white;
+    position: relative;
+    color: white;
     font-size: 24px;
-    left:-212px;
-    top:103px;
+    left: -212px;
+    top: 103px;
 }
 
 
 
 
-*:before, *:after {
+*:before,
+*:after {
     content: '';
     position: absolute;
 }
+
 .inputSwitch {
     height: 40px;
     left: 0;
@@ -32,6 +36,7 @@
     top: 0;
     width: 40px;
 }
+
 .toggle-wrapper {
     flex: 1 1 calc(100% / 3);
     min-height: 50vh;
@@ -41,46 +46,59 @@
     overflow: hidden;
     position: relative;
 }
+
 @media (max-width: 960px) {
     .toggle-wrapper {
         flex: 1 1 calc(100% / 2);
-   }
+    }
 }
+
 @media (max-width: 700px) {
     .toggle-wrapper {
         flex: 1 1 100%;
-   }
+    }
 }
+
 .toggle-wrapper:nth-child(1) {
     background: #dec387;
 }
+
 .toggle-wrapper:nth-child(2) {
     background: #de8797;
 }
+
 .toggle-wrapper:nth-child(3) {
     background: #87aade;
 }
+
 .toggle-wrapper:nth-child(4) {
     background: #c5de87;
 }
+
 .toggle-wrapper:nth-child(5) {
     background: #87ded2;
 }
+
 .toggle-wrapper:nth-child(6) {
     background: #c487de;
 }
+
 .toggle-wrapper:nth-child(7) {
     background: #de8787;
 }
+
 .toggle-wrapper:nth-child(7) .toggle {
     transform: translate(-40px, 40px);
 }
+
 .toggle-wrapper:nth-child(8) {
     background: #decf87;
 }
+
 .toggle-wrapper:nth-child(8) .toggle {
     transform: translate(-40px, 40px);
 }
+
 .name {
     width: 80%;
     position: absolute;
@@ -92,10 +110,12 @@
     right: 15px;
     text-align: right;
 }
+
 .toggle {
     position: relative;
     display: inline-block;
 }
+
 label.toggle-item {
     width: 7em;
     background: #2e394d;
@@ -108,6 +128,7 @@ label.toggle-item {
     transform-origin: 20% center;
     cursor: pointer;
 }
+
 label.toggle-item:before {
     display: block;
     transition: all 0.2s ease;
@@ -119,11 +140,13 @@ label.toggle-item:before {
     border: 2px solid #88cf8f;
     transition: 0.3s ease;
 }
+
 .normal label {
     background: #af4c4c;
     border: 0.5px solid rgba(117, 117, 117, 0.31);
     box-shadow: inset 0px 0px 4px 0px rgba(0, 0, 0, 0.2), 0 -3px 4px rgba(0, 0, 0, 0.15);
 }
+
 .normal label:before {
     border: none;
     width: 2.5em;
@@ -132,6 +155,7 @@ label.toggle-item:before {
     background: #fff;
     transform: rotate(-25deg);
 }
+
 .normal label:after {
     background: transparent;
     height: calc(100% + 8px);
@@ -142,17 +166,21 @@ label.toggle-item:before {
     z-index: 0;
     box-shadow: inset 0px 2px 4px -2px rgba(0, 0, 0, 0.2), 0px 1px 2px 0px rgba(151, 151, 151, 0.2);
 }
-#normal:checked + label {
+
+#normal:checked+label {
     background: #4caf50;
 }
-#normal:checked + label:before {
+
+#normal:checked+label:before {
     left: 67px;
 }
+
 .transparent label {
     background: transparent;
     border: 3px solid #fff;
     height: 3.35em;
 }
+
 .transparent label:before {
     border: 3px solid #fff;
     width: 2em;
@@ -161,12 +189,15 @@ label.toggle-item:before {
     left: 0.3em;
     background: #fff;
 }
-#transparent:checked + label:before {
+
+#transparent:checked+label:before {
     transform: translateX(59px);
 }
+
 .checkcross label:before {
     content: none;
 }
+
 .checkcross .check {
     border-radius: 50%;
     width: 2.5em;
@@ -177,41 +208,51 @@ label.toggle-item:before {
     top: 4.5px;
     left: 4.5px;
 }
-.checkcross .check:before, .checkcross .check:after {
+
+.checkcross .check:before,
+.checkcross .check:after {
     height: 4px;
     border-radius: 10px;
     background: #fff;
     transition: 0.4s ease;
 }
+
 .checkcross .check:before {
     width: 25px;
     transform: rotate(-45deg) translate(-6px, 20px);
 }
+
 .checkcross .check:after {
     width: 10px;
     transform: rotate(45deg) translate(20px, 11px);
 }
-#checkcross:checked + label .check {
+
+#checkcross:checked+label .check {
     left: 68px;
     transform: rotate(360deg);
     background: #c34a4a;
 }
-#checkcross:checked + label .check:before {
+
+#checkcross:checked+label .check:before {
     width: 27px;
     transform: rotate(-45deg) translate(-8px, 18px);
 }
-#checkcross:checked + label .check:after {
+
+#checkcross:checked+label .check:after {
     width: 27px;
     transform: rotate(45deg) translate(18px, 8px);
 }
-#gravity:checked + label {
+
+#gravity:checked+label {
     transform: rotate(90deg);
 }
-#gravity:checked + label:before {
+
+#gravity:checked+label:before {
     transform: translateX(67px);
     transition-delay: 0.2s;
     transition: 0.6s cubic-bezier(0.895, 0.03, 0.685, 0.22) 0.2s;
 }
+
 .beer-pong label:before {
     background: #f9f9f9;
     box-shadow: inset 0 -3px 0 0 #c6c5c5;
@@ -221,6 +262,7 @@ label.toggle-item:before {
     top: 0.25em;
     left: 0.25em;
 }
+
 .beer-pong .cup {
     top: -3%;
     right: -118px;
@@ -233,6 +275,7 @@ label.toggle-item:before {
     transform-origin: bottom right;
     transition: 0.2s cubic-bezier(0.42, 0.5, 0.58, 1);
 }
+
 .beer-pong .cup:before {
     box-shadow: 0 -10px 0 0px rgba(39, 39, 39, 0.1), 0px -20px 0 0px rgba(39, 39, 39, 0.1);
     border-radius: 3px;
@@ -243,6 +286,7 @@ label.toggle-item:before {
     height: 4px;
     top: -40px;
 }
+
 .beer-pong .cup .lid {
     position: absolute;
     width: 95px;
@@ -252,6 +296,7 @@ label.toggle-item:before {
     bottom: 86px;
     left: -23px;
 }
+
 .beer-pong .cup .lid:after {
     background: #efefef;
     width: 48px;
@@ -261,66 +306,86 @@ label.toggle-item:before {
     top: 94px;
     border-radius: 0 0 3px 3px;
 }
-#beer-pong:checked ~ .cup {
+
+#beer-pong:checked~.cup {
     animation: 0.2s linear cup 1s forwards;
 }
-#beer-pong:checked + label:before {
+
+#beer-pong:checked+label:before {
     animation: 2s linear bounce-off forwards;
 }
+
 @keyframes cup {
     0% {
         transform: none;
-   }
+    }
+
     50% {
         transform: rotate(75deg) translate(10px, 15px);
-   }
+    }
+
     90% {
         transform: rotate(70deg) translate(10px, 15px);
-   }
+    }
+
     100% {
         transform: rotate(75deg) translate(10px, 15px);
-   }
+    }
 }
+
 @keyframes bounce-off {
     0% {
         transform: translateY(0);
-   }
-    10%, 25% {
+    }
+
+    10%,
+    25% {
         transform: translate(-20px, -80px);
-   }
+    }
+
     50% {
         transform: rotate(163deg);
         transform-origin: 100px -12px;
-   }
+    }
+
     70% {
         transform: rotate(0) translate(-3px, -8px);
         transform-origin: 100px -12px;
-   }
+    }
+
     75% {
         transform: translate(20px, -8px);
-   }
+    }
+
     80% {
         transform: translate(30px, 0px);
-   }
+    }
+
     85% {
         transform: translate(40px, -3px);
-   }
+    }
+
     87% {
         transform: translate(46px, 0px);
-   }
+    }
+
     90% {
         transform: translate(52px, -1px);
-   }
+    }
+
     95% {
         transform: translate(60px, 0px);
-   }
+    }
+
     100% {
         transform: translate(64px, 0px);
-   }
+    }
 }
+
 .dog-rollover label:before {
     content: none;
 }
+
 .dog-rollover label .dog {
     display: inline-block;
     position: absolute;
@@ -330,6 +395,7 @@ label.toggle-item:before {
     left: 0.2em;
     transition: 0.6s ease;
 }
+
 .dog-rollover label .eyes {
     position: absolute;
     width: 8px;
@@ -339,6 +405,7 @@ label.toggle-item:before {
     transform: translate(8px, 14px);
     box-shadow: 16px 0 0 #222, 22px -4px 0 12px #e4ac04;
 }
+
 .dog-rollover label .ear {
     width: 18px;
     height: 20px;
@@ -351,6 +418,7 @@ label.toggle-item:before {
     box-shadow: inset 4px 0 0 0px #fff, inset -4px 0 0 0px #fff;
     transform: rotate(-40deg);
 }
+
 .dog-rollover label .ear.right {
     transform: rotate(60deg) scaleX(-1);
     left: auto;
@@ -358,6 +426,7 @@ label.toggle-item:before {
     transition: 0.4s ease-in-out;
     right: 0px;
 }
+
 .dog-rollover label .face {
     overflow: hidden;
     border-radius: 50%;
@@ -367,6 +436,7 @@ label.toggle-item:before {
     background: #fff;
     z-index: 8;
 }
+
 .dog-rollover label .mouth {
     position: absolute;
     background: #222;
@@ -380,6 +450,7 @@ label.toggle-item:before {
     transform: scale(0);
     transition: 0.1s ease;
 }
+
 .dog-rollover label .mouth:before {
     width: 8px;
     height: 8px;
@@ -387,31 +458,39 @@ label.toggle-item:before {
     border-radius: 0 0 50% 50%;
     transform: translate(3px, 5px);
 }
+
 .dog-rollover label:before {
     border-color: white;
     background: white;
 }
-#doggo:checked ~ .cup {
+
+#doggo:checked~.cup {
     animation: 0.2s linear cup 1s forwards;
 }
-#doggo:checked + label .dog {
+
+#doggo:checked+label .dog {
     left: 68px;
     transform: rotate(360deg);
 }
-#doggo:checked + label .mouth {
+
+#doggo:checked+label .mouth {
     transform: scale(1);
     transition-delay: 0.7s;
 }
-#doggo:checked + label .ear.right {
+
+#doggo:checked+label .ear.right {
     transform: scaleX(-1) rotate(-35deg);
     transition-delay: 0.6s;
 }
+
 .basketball-hoop label {
     background: #fdb827;
 }
+
 .basketball-hoop label:before {
     content: none;
 }
+
 .basketball-hoop .ball {
     border-radius: 50%;
     width: 2.5em;
@@ -424,12 +503,14 @@ label.toggle-item:before {
     left: 4px;
     background-image: radial-gradient(circle at -5px 10px, transparent 15px, black 15px, black 17px, transparent 17px), radial-gradient(circle at 41px 25px, transparent 15px, black 15px, black 17px, transparent 17px), linear-gradient(110deg, transparent 22px, black 22px, black 24px, transparent 24px), linear-gradient(18deg, transparent 22px, black 22px, black 24px, transparent 24px);
 }
+
 .basketball-hoop .ball__wrapper {
     transition: 0.4s ease;
     width: 195%;
     height: 200%;
     transform-origin: 50% -2%;
 }
+
 .basketball-hoop .hoop {
     top: -50px;
     right: -84px;
@@ -438,6 +519,7 @@ label.toggle-item:before {
     height: 8px;
     position: absolute;
 }
+
 .basketball-hoop .hoop:before {
     position: absolute;
     right: -4px;
@@ -446,6 +528,7 @@ label.toggle-item:before {
     background: #cd2e22;
     top: -40px;
 }
+
 .basketball-hoop .hoop:after {
     width: 40px;
     height: 35px;
@@ -457,74 +540,97 @@ label.toggle-item:before {
     left: 2px;
     z-index: 20;
 }
-#hoop:checked + label {
+
+#hoop:checked+label {
     background: #542583;
     transition-delay: 1.35s;
 }
-#hoop:checked + label .ball__wrapper {
+
+#hoop:checked+label .ball__wrapper {
     animation: 1.5s linear ball-wrapper forwards;
 }
-#hoop:checked + label .ball {
+
+#hoop:checked+label .ball {
     animation: 1.5s linear ball forwards;
 }
+
 @keyframes ball {
     0% {
         transform: none;
-   }
+    }
+
     40% {
         transform: rotate(-150deg);
-   }
+    }
+
     48% {
         transform: rotate(-150deg) translateY(92px);
-   }
+    }
+
     52% {
         transform: rotate(-150deg) translate(-10px, 80px);
-   }
+    }
+
     56% {
         transform: rotate(-150deg) translate(-25px, 91px);
-   }
+    }
+
     60% {
         transform: rotate(-150deg) translate(-35px, 86px);
-   }
+    }
+
     65% {
         transform: rotate(-150deg) translate(-45px, 91px);
-   }
+    }
+
     70% {
         transform: rotate(-150deg) translate(-50px, 87px);
-   }
+    }
+
     75% {
         transform: rotate(-150deg) translate(-60px, 91px);
-   }
+    }
+
     80% {
         transform: rotate(-150deg) translate(-65px, 88px);
-   }
+    }
+
     85% {
         transform: rotate(-150deg) translate(-70px, 91px);
-   }
+    }
+
     90% {
         transform: rotate(-150deg) translate(-75px, 90px);
-   }
+    }
+
     95% {
         transform: rotate(-150deg) translate(-80px, 90px);
-   }
+    }
+
     100% {
         transform: rotate(-150deg) translate(-82px, 91px);
-   }
+    }
 }
+
 @keyframes ball-wrapper {
     0% {
         transform: none;
-   }
-    40%, 100% {
+    }
+
+    40%,
+    100% {
         transform: rotate(150deg);
-   }
+    }
 }
+
 .pancake-stack label:before {
     content: none;
 }
+
 .pancake-stack .pancakes {
     transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
 .pancake-stack .pancake {
     background: #e27c31;
     border-radius: 50%;
@@ -536,31 +642,38 @@ label.toggle-item:before {
     left: 4px;
     box-shadow: 0 2px 0 2px #fbbe7c;
 }
+
 .pancake-stack .pancake:nth-child(2) {
     left: 0;
     top: -3px;
     transform: scale(0);
     transition: 0.2s ease 0.2s;
 }
+
 .pancake-stack .pancake:nth-child(3) {
     top: -8px;
     transform: scale(0);
     transition: 0.2s ease 0.2s;
 }
-.pancake-stack .pancake:nth-child(3):before, .pancake-stack .pancake:nth-child(3):after {
+
+.pancake-stack .pancake:nth-child(3):before,
+.pancake-stack .pancake:nth-child(3):after {
     background: #ef8927;
     border-radius: 20px;
     width: 50%;
     height: 20%;
 }
+
 .pancake-stack .pancake:nth-child(3):before {
     top: 20px;
     left: 5px;
 }
+
 .pancake-stack .pancake:nth-child(3):after {
     top: 22px;
     right: 5px;
 }
+
 .pancake-stack .butter {
     width: 12px;
     height: 11px;
@@ -573,21 +686,26 @@ label.toggle-item:before {
     transform: scale(0);
     transition: 0.2s ease;
 }
-#pancake:checked + label .pancakes {
+
+#pancake:checked+label .pancakes {
     transform: translateX(70px);
 }
-#pancake:checked + label .pancake:nth-child(2) {
+
+#pancake:checked+label .pancake:nth-child(2) {
     transform: scale(1);
     transition-delay: 0.2s;
 }
-#pancake:checked + label .pancake:nth-child(3) {
+
+#pancake:checked+label .pancake:nth-child(3) {
     transform: scale(1);
     transition-delay: 0.4s;
 }
-#pancake:checked + label .butter {
+
+#pancake:checked+label .butter {
     transform: scale(1);
     transition-delay: 0.6s;
 }
+
 .footer {
     flex-wrap: wrap;
     padding: 5rem 5rem 3rem;
@@ -599,18 +717,22 @@ label.toggle-item:before {
     align-items: center;
     justify-content: center;
 }
+
 .footer a {
     text-decoration: none;
     color: #fff;
     padding: 3px 0;
     border-bottom: 1px dashed;
 }
+
 .footer a:hover {
     border-bottom: 1px solid;
 }
+
 footer {
     margin-top: 1.5rem;
 }
+
 footer a {
     text-decoration: none;
     display: inline-block;
@@ -622,14 +744,17 @@ footer a {
     color: #fff;
     margin: 5px;
 }
+
 footer a:hover {
     background: rgba(255, 255, 255, 0.1);
 }
+
 footer a .icons {
     margin-top: 8px;
     display: inline-block;
     font-size: 20px;
 }
+
 footer a .icons:before {
     position: relative;
 }

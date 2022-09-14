@@ -23,7 +23,7 @@ function load(emphasisRelation, showConnectionLines) {
   drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
   // zeichne nun gegebene Koordinaten mit Verbindungslinien für P und Q
   qCollection.push([a, xOffset, yOffset]); // als 3. Item - Skaling-Infos mitschicken von dem Verbindungsgraphen
-  drawCoords(data.xP, data.yP, a, xOffset, yOffset,"CIRCLE", [63, 136, 143],showConnectionLines? qCollection : undefined);
+  drawCoords(data.xP, data.yP, a, xOffset, yOffset, "CIRCLE", [63, 136, 143], showConnectionLines ? qCollection : undefined);
   drawCoords(data.xQ, data.yQ, a, xOffset, yOffset, "RECT", [255, 127, 80]);
 }
 
@@ -34,7 +34,7 @@ inputRange.value = "0.6";
 inputRange.addEventListener('input', (event) => {
   let val = inputRange.value;
   document.getElementById("rangeCounter").innerHTML = val;
-  load(val,showWite);
+  load(val, showWite);
 }); // input als id wurde von p5js reserviert / blockiert
 document.addEventListener('mouseup', (event) => { // feuert jedes mal aber merkt man nicht ..
   load(inputRange.value, false);
