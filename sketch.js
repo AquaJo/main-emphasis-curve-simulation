@@ -1,10 +1,14 @@
 
-function setup() {
-  load(0.6);
-}
-function load(emphasisRelation, showConnectionLines) {
-  createCanvas(1000, 430); // man könnte auch background neu setzen und überschreiben, wäre evt. effizienter --> wegen input range refreshs
+let zoomFactor = 100;
 
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  load(zoomFactor, xOffset, yOffset, 0.6);
+}
+let xOffset = 60;
+let yOffset = 380;
+function load(a, xOffset, yOffset, emphasisRelation, showConnectionLines) {
+  background(19, 19, 18);
   let unsplittedKoords =
     "0,000;0,00;1,30;0,00;0,70* 0,050;-0,03;1,50;0,42;1,11* 0,100;0,12;1,53;0,72;1,60* 0,150;0,51;1,56;0,84;2,05* 0,200;1,03;1,76;0,88;2,34* 0,250;1,49;2,17;0,95;2,43* 0,300;1,74;2,66;1,18;2,43* 0,350;1,76;3,03;1,56;2,46* 0,400;1,71;3,16;2,00;2,63* 0,450;1,77;3,05;2,36;2,93* 0,500;2,07;2,87;2,55;3,23* 0,550;2,56;2,81;2,61;3,41* 0,600;3,07;2,96;2,65;3,39* 0,650;3,41;3,26;2,81;3,23* 0,700;3,51;3,52;3,14;3,05* 0,750;3,46;3,57;3,57;2,98* 0,800;3,46;3,36;3,98;3,06* 0,850;3,66;3,01;4,24;3,19* 0,900;4,09;2,70;4,33;3,25* 0,950;4,62;2,59;4,36;3,13* 1,000;5,04;2,67;4,46;2,83* 1,050;5,23;2,78;4,73;2,46* 1,100;5,23;2,75;5,14;2,16* 1,150;5,18;2,46;5,57;2,00* 1,200;5,29;1,95;5,89;1,94* 1,250;5,64;1,42;6,05;1,87* 1,300;6,15;1,04;6,09;1,64* 1,350;6,64;0,88;6,14;1,22* 1,400;6,92;0,82;6,34;0,68* 1,450;6,98;0,69;6,70;0,16"; // aus dem csv entnommen
   let data = getCoords(unsplittedKoords); // function um koordinaten zu entnehmen --> return object
@@ -14,12 +18,6 @@ function load(emphasisRelation, showConnectionLines) {
   let qCollection = [data.xQ, data.yQ];
 
   let mainEmphasisCoords = getCoordsInRelation(pCollection, qCollection, emphasisRelation, true);
-  console.log(mainEmphasisCoords[1]);
-
-
-  let yOffset = 424; // ist anders zu x nicht direkt vom Rand ausgehend, sondern vom tiefsten Punkt
-  let xOffset = 60;
-  let a = 100;
   drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
   // zeichne nun gegebene Koordinaten mit Verbindungslinien für P und Q
   qCollection.push([a, xOffset, yOffset]); // als 3. Item - Skaling-Infos mitschicken von dem Verbindungsgraphen
@@ -34,12 +32,34 @@ inputRange.value = "0.6";
 inputRange.addEventListener('input', (event) => {
   let val = inputRange.value;
   document.getElementById("rangeCounter").innerHTML = val;
-  load(val, showWite); // reload mit Relations-Wert & weiße Kurve einblenden / nicht einblenden
+  load(zoomFactor, xOffset, yOffset, val, showWite); // reload mit Relations-Wert & weiße Kurve einblenden / nicht einblenden
 }); // input als id wurde von p5js reserviert / blockiert
-document.addEventListener('mouseup', (event) => { // feuert jedes mal aber merkt man nicht .. --> weiße Kurve löschen
-  load(inputRange.value, false);
+
+document.addEventListener('wheel', (event) => { // mouse scroll für resizing detecten in canvas von p5js
+  zoomFactor += event.deltaY / 70;
+  load(zoomFactor, xOffset, yOffset, inputRange.value, false);
 });
 
+document.addEventListener('mousedown', (event) => {
+  let dragOffsetX = xOffset - event.pageX; // um den Offset zum Graph XY Mittelpunkt und der Maus zu berechen
+  let dragOffsetY = yOffset - event.pageY;
+  document.addEventListener('mousemove', onMouseMove);
+  function onMouseMove(event) { // dragging erkennen um Diagramm auf (relativer) Maus-Position zu halten
+    let newX = event.pageX + dragOffsetX; // offset addieren, damit der Graph sich 'smooth' bewegt
+    let newY = event.pageY + dragOffsetY;
+    
+      xOffset = newX;
+      yOffset = newY;
+      load(zoomFactor, xOffset, yOffset, inputRange.value, false);
+    
+  }
+  document.addEventListener('mouseup', onMouseUp);
+  function onMouseUp() { // feuert jedes mal aber merkt man nicht .. --> weiße Kurve löschen & mouse mouse listener + mouseupListener löschen --> werden wieder erstellt
+    load(zoomFactor, xOffset, yOffset, inputRange.value, false);
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+});
 // auf den switch-Input hören
 let inputSwitch = document.getElementById("checkcross");
 inputSwitch.addEventListener('input', (event) => {
@@ -86,13 +106,12 @@ function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
   let lastY;
   for (let i = 0; i < x.length; ++i) {
     let newX = a * x[i] + offsetX; // offset etc anwenden
-    let newY = -a * y[i] + offsetY; // - a , da y-koord-achse gespiegelt ist
+    let newY = -a * y[i] + offsetY + a / (1 + offsetY / 1000); // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
     if (i != 0) {
       // Strecken einzeichnen
       // alle Strecken einzeichnen, nach i == 0
       stroke(color[0], color[1], color[2]);
       line(newX, newY, lastX, lastY);
-      //console.log(x[i] + "  " + x[i - 1]);
       noStroke();
     }
     lastX = newX; // copy machen von neuen xy - koords um danach Strecken zeichnen zu können
@@ -104,7 +123,7 @@ function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
       let oA = othersCords[2][0]; // erst schön übersichtlich Daten aus Array übertragen
       let oX = othersCords[2][1];
       let oY = othersCords[2][2];
-      line(newX, newY, a * othersCords[0][i] + oX, -oA * othersCords[1][i] + oY);
+      line(newX, newY, a * othersCords[0][i] + oX, -oA * othersCords[1][i] + oY + oA / (1 + (oY / 1000)));
       noStroke();
     }
 
