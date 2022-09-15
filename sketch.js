@@ -19,7 +19,7 @@ function presetCoordinates() {
   return data;
 }
 function loadWithDefaults() { // damit man nicht immer dasselbe schreiben muss, man hätte auch direkt als global vars schreiben können, dann könnte man aber im Falle der Fälle nicht einfach beliebige Werte einsetzen /// leichter wiederverwendbar
-  load(coordinates,"no",zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow);
+  load(coordinates,zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow);
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -30,18 +30,38 @@ let yOffset = 360;
 
 
 
-function load(cords,emphasisCurveDetails, a, xOffset, yOffset, emphasisRelation, showConnectionLines) {
+function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines) {
   background(19, 19, 18);
   let data = cords; // habe vorher direkt hier presetCords erfragt und als data gespeichert --> deswegen Übertragung
-  for (let graphKey in data) { // key entspricht 1 Object mit x für x-Kords und y für y-Kords
+  for (let graphKey in data) { // zweifache for Schleife des selbigen Typs, da erst im Falle die Schwerpunktbahn-Kurve gezeichnet wird, damit diese in den Hintergrund rutscht, egal welches Object welchen Partner angegeben hat
     let graph = data[graphKey];
     let emphasisPartner;
+    let meCollection;
+    let partnerCollection;
     try {
+      meCollection = [graph.x,graph.y]; // collections der Übersichts halber seperat setzen und übertragen
       emphasisPartner = graph.config.emphasis.partner;
+      partnerCollection = [data[emphasisPartner].x,data[emphasisPartner].y];
+      // bis hier gekommen -> Schwerpunkbahn-Kords benötigt ... // zweifacher draw in einer for - iteration
+      let mainEmphasisCoords = getCoordsInRelation(meCollection, partnerCollection, emphasisRelation, true);
+      drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
     } catch(e) {
       emphasisPartner = undefined;
     }
-    drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? [data[emphasisPartner].x,data[emphasisPartner].y,[a, xOffset, yOffset]] : undefined);
+  }
+  for (let graphKey in data) { // key entspricht 1 Object mit x für x-Kords und y für y-Kords
+    let graph = data[graphKey];
+    let emphasisPartner;
+    let partnerCollection;
+    try {
+      emphasisPartner = graph.config.emphasis.partner;
+      // bis hier gekommen -> Schwerpunkbahn-Kords bereits gezeichnet ...
+      partnerCollection = [data[emphasisPartner].x,data[emphasisPartner].y];
+      partnerCollection.push([a, xOffset, yOffset]); // partner info mitschicken, also auch mein offset etc. ... für Verbindungs-Linien
+    } catch(e) {
+      emphasisPartner = undefined;
+    }
+    drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
   }
   /*
   // zeichne die Schwerpunkt-Kurve zuerst, damit sie hinter den anderen beiden Kurven ist, ... --> schönerer Effekt beim überlappen (emphasisRelation == 0 || 1)
