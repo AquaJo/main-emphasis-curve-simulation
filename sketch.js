@@ -36,7 +36,7 @@ inputRange.addEventListener('input', (event) => {
 }); // input als id wurde von p5js reserviert / blockiert
 
 document.addEventListener('wheel', (event) => { // mouse scroll für resizing detecten in canvas von p5js
-  zoomFactor += event.deltaY / 70;
+  zoomFactor -= event.deltaY / 70;
   load(zoomFactor, xOffset, yOffset, inputRange.value, false);
 });
 
