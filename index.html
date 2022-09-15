@@ -13,24 +13,26 @@
 <body class="noselect">
   <main>
     <br />
-    <input type="range" id="inputByMe"
-      title="slider to change supposed main emphasis point&#013;in relation to route XY(blue) and XY(orange)"
-      class="specifiedRange" min="0" max="1" step="0.01" />
-    <p id="rangeCounter" class="rangeCounter">0.6</p>
+    <div id="options">
+      <input type="range" id="inputByMe"
+        title="slider to change supposed main emphasis point&#013;in relation to route XY(blue) and XY(orange)"
+        class="specifiedRange" min="0" max="1" step="0.01" />
+      <p id="rangeCounter" class="rangeCounter">0.6</p>
 
-    <div class="toggle checkcross">
-      <p id="switchText">show white lines</p>
-      <input class="inputSwitch" id="checkcross" type="checkbox" /><label id="inputCheckSpecified" class="toggle-item"
-        for="checkcross">
-        <div class="check"> </div>
-      </label>
+      <div class="toggle checkcross">
+        <p id="switchText">show white lines</p>
+        <input class="inputSwitch" id="checkcross" type="checkbox" /><label id="inputCheckSpecified" class="toggle-item"
+          for="checkcross">
+          <div class="check"> </div>
+        </label>
+      </div>
     </div>
 
     <p class="footer first P">P - Cords</p>
     <p class="footer first Q">Q - Cords</p>
     <p class="footer second emphasis">supposed main emphasis curve ('S')</p>
     <p class="footer third white">PQ - connection lines</p>
-    
+
   </main>
   <script src="sketch.js"></script>
 </body>

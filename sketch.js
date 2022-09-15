@@ -40,18 +40,29 @@ document.addEventListener('wheel', (event) => { // mouse scroll für resizing de
   load(zoomFactor, xOffset, yOffset, inputRange.value, false);
 });
 
+let options = document.getElementById("options"); // auf Maus hover hören bei element (id === "options"), um Maus-Graphen-Dragging beim zB. Slider zu vermeiden
+options.mouseIsOver = false;
+options.onmouseover = function () {
+  this.mouseIsOver = true;
+};
+options.onmouseout = function () {
+  this.mouseIsOver = false;
+}
+
+
 document.addEventListener('mousedown', (event) => {
   let dragOffsetX = xOffset - event.pageX; // um den Offset zum Graph XY Mittelpunkt und der Maus zu berechen
   let dragOffsetY = yOffset - event.pageY;
   document.addEventListener('mousemove', onMouseMove);
   function onMouseMove(event) { // dragging erkennen um Diagramm auf (relativer) Maus-Position zu halten
-    let newX = event.pageX + dragOffsetX; // offset addieren, damit der Graph sich 'smooth' bewegt
-    let newY = event.pageY + dragOffsetY;
-    
+    if (!options.mouseIsOver) {
+      let newX = event.pageX + dragOffsetX; // offset addieren, damit der Graph sich 'smooth' bewegt
+      let newY = event.pageY + dragOffsetY;
+
       xOffset = newX;
       yOffset = newY;
       load(zoomFactor, xOffset, yOffset, inputRange.value, false);
-    
+    }
   }
   document.addEventListener('mouseup', onMouseUp);
   function onMouseUp() { // feuert jedes mal aber merkt man nicht .. --> weiße Kurve löschen & mouse mouse listener + mouseupListener löschen --> werden wieder erstellt
