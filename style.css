@@ -20,7 +20,7 @@ body {
   background: rgb(19, 19, 18);
   margin: 0;
   padding: 0;
-  font-family: "Sora", sans-serif;
+  font-family: "Sora";
 }
 
 .noselect {
@@ -43,19 +43,19 @@ canvas {
 }
 
 .footer { /* zu spät aufgefallen, dass switches.css ebenfalls footer als class benutzt ...*/
-  position: fixed;
+  position: absolute;
 }
 
 .footer.first {
-  margin-top: 250px;
+  top: 310px;
 }
 
 .footer.second {
-  margin-top: 280px;
+  top: 330px;
 }
 
 .footer.third {
-  margin-top: 310px;
+  top: 353px;
 }
 
 .footer.P {

@@ -22,16 +22,16 @@ function loadWithDefaults() { // damit man nicht immer dasselbe schreiben muss, 
   load(coordinates,zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow);
 }
 function setup() {
-  createCanvas(windowWidth, windowHeight);
   loadWithDefaults();
 }
 let xOffset = 60;
-let yOffset = 360;
+let yOffset = 350;
 
 
 
 function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines) {
-  background(19, 19, 18);
+  //background(19, 19, 18);
+  createCanvas(windowWidth, windowHeight); // vllt ineffektiver / langsamer --> passt sich aber jedes mal auf die Screenweite an ...
   let data = cords; // habe vorher direkt hier presetCords erfragt und als data gespeichert --> deswegen Übertragung
   for (let graphKey in data) { // zweifache for Schleife des selbigen Typs, da erst im Falle die Schwerpunktbahn-Kurve gezeichnet wird, damit diese in den Hintergrund rutscht, egal welches Object welchen Partner angegeben hat
     let graph = data[graphKey];
