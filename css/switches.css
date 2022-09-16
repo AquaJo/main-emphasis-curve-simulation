@@ -3,10 +3,11 @@
 }
 
 .checkcross {
-    position: fixed !important;
-    zoom: 0.6;
-    left: 1050px;
-    top: -50px;
+    position: absolute !important;
+    margin-left: 540px;
+    margin-top: -50px;
+    transform: scale(0.6);
+    transform-origin: 60% 0;
 }
 
 #switchText {
@@ -726,7 +727,7 @@ label.toggle-item:before {
     border-bottom: 1px solid;
 }
 
-footer { 
+footer {
     margin-top: 1.5rem;
 }
 

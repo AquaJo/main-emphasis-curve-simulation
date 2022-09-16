@@ -18,12 +18,14 @@ function presetCoordinates() {
   }
   return data;
 }
-function loadWithDefaults() { // damit man nicht immer dasselbe schreiben muss, man hätte auch direkt als global vars schreiben können, dann könnte man aber im Falle der Fälle nicht einfach beliebige Werte einsetzen /// leichter wiederverwendbar
-  load(coordinates,zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow);
-}
+
 function setup() {
   loadWithDefaults();
 }
+function loadWithDefaults() { // damit man nicht immer dasselbe schreiben muss, man hätte auch direkt als global vars schreiben können, dann könnte man aber im Falle der Fälle nicht einfach beliebige Werte einsetzen /// leichter wiederverwendbar
+  load(coordinates,zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow);
+}
+
 let xOffset = 60;
 let yOffset = 350;
 
@@ -132,8 +134,16 @@ document.addEventListener('mousedown', (event) => {
 // auf den switch-Input hören
 let inputSwitch = document.getElementById("checkcross");
 inputSwitch.addEventListener('input', (event) => {
-  showWhite = !showWhite;
 });
+
+document.getElementById("editInput").addEventListener("click", () => {
+  $('#mainModal').modal('show');
+})
+
+
+
+
+
 function getCoordsInRelation(collection1, collection2, relation, fixed) {
   let newCollection = [];
   let allX = [];
