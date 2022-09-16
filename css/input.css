@@ -107,12 +107,20 @@ input[type=range]:focus::-ms-fill-upper {
   margin-left: 50px !important;
 }
 
-.rangeCounter {
+
+#rangeCounter {
   position: fixed;
   color: white;
   font-size: 15px;
   margin-left: 310px;
   margin-top: 12px;
+}
+#rangeCounterFromP {
+  position: fixed;
+  color: white;
+  font-size: 15px;
+  margin-left: 310px;
+  margin-top: 30px;
 }
 #editInput {
   position: absolute;

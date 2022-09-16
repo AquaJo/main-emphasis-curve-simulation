@@ -84,13 +84,14 @@ let showWhite = true;
 let showWhiteNow = false;
 // auf input change hören
 let inputRange = document.getElementById("inputByMe");
-inputRange.value = "0.6";
+inputRange.value = "0.2";
+let rangeCounter = document.getElementById("rangeCounter");
 inputRange.addEventListener('input', (event) => {
   if (showWhite) {
     showWhiteNow = true;
   }
   let val = inputRange.value;
-  document.getElementById("rangeCounter").innerHTML = val;
+  rangeCounter.innerHTML = val;
   loadWithDefaults(); // reload mit Relations-Wert & weiße Kurve einblenden / nicht einblenden
   showWhiteNow = false;
 }); // input als id wurde von p5js reserviert / blockiert
@@ -115,7 +116,7 @@ document.addEventListener('mousedown', (event) => {
   let dragOffsetY = yOffset - event.pageY;
   document.addEventListener('mousemove', onMouseMove);
   function onMouseMove(event) { // dragging erkennen um Diagramm auf (relativer) Maus-Position zu halten
-    if (!options.mouseIsOver) {
+    if (!options.mouseIsOver && window.getComputedStyle(mainModal).display === "none") {
       let newX = event.pageX + dragOffsetX; // offset addieren, damit der Graph sich 'smooth' bewegt
       let newY = event.pageY + dragOffsetY;
 
@@ -134,16 +135,54 @@ document.addEventListener('mousedown', (event) => {
 // auf den switch-Input hören
 let inputSwitch = document.getElementById("checkcross");
 inputSwitch.addEventListener('input', (event) => {
+  showWhite = !showWhite;
 });
 
-document.getElementById("editInput").addEventListener("click", () => {
+
+
+let mainModal = document.getElementById("mainModal");
+let mainModalTitle = document.getElementById("mainModalTitle");
+let mainModalFooterBtn1 = document.getElementById("mainModalFooterBtn1");
+let mainModalFooterBtn2 = document.getElementById("mainModalFooterBtn2");
+let mainModalInputRange = document.getElementById("mainModalInputRange");
+
+mainModal.addEventListener('hidden.bs.modal', detectModalClose); // auf modal-Schließung hören
+function detectModalClose() {
+  // modal resetten
+  mainModalFooterBtn1.style.display = "block";
+  mainModalFooterBtn2.style.display = "block";
+  mainModalInputRange.style.display = "none";
+}
+document.getElementById("editInput").addEventListener("click", () => { // für den input-range - Modal-Dialog
+  mainModalTitle.innerHTML = "set input range";
+  mainModalFooterBtn1.style.display = "none";
+  mainModalFooterBtn2.innerHTML = "apply";
+  mainModalInputRange.style.display = "block";
+  let myInput = document.getElementById("mainModalInputRangeNumberInput");
+  myInput.value = parseInt(inputRange.max);
+  mainModalFooterBtn2.addEventListener("click", clicked);
+  mainModal.addEventListener('hidden.bs.modal', detectModalClose); // auf mainModal-Schließung hören um private listener zu entfernen + auch diesen wieder
+  function clicked() { // neuen Input Wert setzen --> dabei wenn vorheriger Wert zu gr0 für neuen Bereich, reset auf neuen nähesten Wert
+    if (abs(inputRange.value) > abs(myInput.value)) { 
+      inputRange.value = inputRange.value >= 0 ? abs(myInput.value) : -abs(myInput.value);
+      loadWithDefaults();
+      rangeCounter.innerHTML = inputRange.value;
+    }
+    inputRange.max = abs(myInput.value);
+    inputRange.min = - abs(myInput.value);
+  }
+  function detectModalClose() {
+    mainModalFooterBtn2.removeEventListener("click", clicked); // immer direkt löschen --> keine Doppelten bei neuen Klicks
+    mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
+  }
+
   $('#mainModal').modal('show');
 })
 
 
 
 
-
+let fromPToQ = 0.6;
 function getCoordsInRelation(collection1, collection2, relation, fixed) {
   let newCollection = [];
   let allX = [];
@@ -156,9 +195,12 @@ function getCoordsInRelation(collection1, collection2, relation, fixed) {
 
     let x1x2 = x2 - x1; // verschiebung zwischen einzelnen Koordinaten bestimmen
     let y1y2 = y2 - y1; // ""
-
-    let newXC = x1x2 * relation; // relation hinzufügen zu Verschiebungen --> auf welchem Prozent der Stecke PQ soll sich die neue Koordinate befinden
-    let newYC = y1y2 * relation; // ""
+    let relativeMultiplicator = (parseFloat(relation/2)+0.5); // direkter Verschiebungsvektor
+    let newXC = x1x2 * relativeMultiplicator; // relation hinzufügen zu Verschiebungen --> +0.5 damit sich Mittelpunkt bei 0 befined & / 2 damit 1 / -1 die Endwerte für die Kurven sind und nicht deren abs == 0.5 ist --> allgemein nicht direkt Relation von P zu PQ genommen, damit man einen gleichen Bezugspunkt --> Mittelpunkt 0 zw. PQ
+    let newYC = y1y2 * relativeMultiplicator; // ""
+    fromPToQ = relativeMultiplicator; // direkter Verschiebungsvektor
+    let rounded = Math.round(fromPToQ * 100) / 100; // damit nicht noch mal und nochmal ... berechnet
+    document.getElementById("rangeCounterFromP").innerHTML = rounded == fromPToQ ? fromPToQ + " (from P to Q)" : rounded+" (from P to Q) (~)"; // Math.round zum runden von 2 Dezimalsstellen, damit nicht zu große Zahlen, deswegen ~ wenn nicht identische Zahlen
     let newX;
     let newY;
     if (fixed) {

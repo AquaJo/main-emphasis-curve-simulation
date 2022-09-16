@@ -29,6 +29,12 @@
           </button>
         </div>
         <div id="mainModalText" class="modal-body">
+          <div id = "mainModalInputRange" class = "displayNone">
+            <div id="mainModalInputRangeNumberInputContainer" class="input-group mb-3 centered noselect">
+              <span class="input-group-text" id="basic-addon3">absolute max range</span>
+              <input type="number" class="form-control" id="mainModalInputRangeNumberInput" aria-describedby="basic-addon3">
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button id="mainModalFooterBtn1" type="button" class="btn btn-secondary hiddenOwn"
@@ -42,9 +48,10 @@
     <br class = "zoomFactor"/>
     <div id="options" class = "zoomFactor">
       <input type="range" id="inputByMe"
-        title="slider to change supposed main emphasis point&#013;in relation to route XY(blue) and XY(orange)"
-        class="specifiedRange" min="0" max="1" step="0.01" />
-      <p id="rangeCounter" class="rangeCounter">0.6</p>
+        title="slider to change supposed main emphasis point&#013;1. in relation to center of PQ where P is -1 and Q 1&#013;2. in relation to P where P = 0 and Q = 1"
+        class="specifiedRange" min="-1" max="1" step="0.01" />
+      <p id="rangeCounter">0.2</p>
+      <p id = "rangeCounterFromP">0.6 (from P to Q)</p>
       <div class="chromeMaterial" id="editInput"></div>
       <div class="toggle checkcross">
         <p id="switchText">show white lines</p>

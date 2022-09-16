@@ -77,3 +77,37 @@ canvas {
   color: white;
   left: -20px;
 }
+
+
+.displayNone {
+  display:none;
+}
+
+#mainModalText {
+  white-space: pre;
+  text-align: left;
+}
+
+#mainModalHeader {
+  color: white;
+  background-color: #323232;
+}
+
+#mainModalContent {
+  color: white;
+  background-color: #323232;
+}
+
+#mainModalInputRangeNumberInputContainer {
+  top:-60px;
+}
+#mainModalInputRange {
+  height:15px;
+}
+
+#mainModalFooterBtn1 {
+  z-index:5 !important;
+}
+#mainModalFooterBtn2 {
+  z-index:5 !important;
+}
