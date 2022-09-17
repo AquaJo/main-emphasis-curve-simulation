@@ -9,7 +9,7 @@ function presetCoordinates() {
     "color": [63, 136, 143],
     "shape": "CIRCLE",
     "emphasis": {
-      "partner":"2"
+      "partner": "2"
     }
   }
   data["2"].config = {
@@ -23,7 +23,7 @@ function setup() {
   loadWithDefaults();
 }
 function loadWithDefaults() { // damit man nicht immer dasselbe schreiben muss, man hätte auch direkt als global vars schreiben können, dann könnte man aber im Falle der Fälle nicht einfach beliebige Werte einsetzen /// leichter wiederverwendbar
-  load(coordinates,zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow);
+  load(coordinates, zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow);
 }
 
 let xOffset = 60;
@@ -35,19 +35,20 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines)
   //background(19, 19, 18);
   createCanvas(windowWidth, windowHeight); // vllt ineffektiver / langsamer --> passt sich aber jedes mal auf die Screenweite an ...
   let data = cords; // habe vorher direkt hier presetCords erfragt und als data gespeichert --> deswegen Übertragung
+  let mainEmphasisCoords;
   for (let graphKey in data) { // zweifache for Schleife des selbigen Typs, da erst im Falle die Schwerpunktbahn-Kurve gezeichnet wird, damit diese in den Hintergrund rutscht, egal welches Object welchen Partner angegeben hat
     let graph = data[graphKey];
     let emphasisPartner;
     let meCollection;
     let partnerCollection;
     try {
-      meCollection = [graph.x,graph.y]; // collections der Übersichts halber seperat setzen und übertragen
+      meCollection = [graph.x, graph.y]; // collections der Übersichts halber seperat setzen und übertragen
       emphasisPartner = graph.config.emphasis.partner;
-      partnerCollection = [data[emphasisPartner].x,data[emphasisPartner].y];
+      partnerCollection = [data[emphasisPartner].x, data[emphasisPartner].y];
       // bis hier gekommen -> Schwerpunkbahn-Kords benötigt ... // zweifacher draw in einer for - iteration
-      let mainEmphasisCoords = getCoordsInRelation(meCollection, partnerCollection, emphasisRelation, true);
+      mainEmphasisCoords = getCoordsInRelation(meCollection, partnerCollection, emphasisRelation, true);
       drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
-    } catch(e) {
+    } catch (e) {
       emphasisPartner = undefined;
     }
   }
@@ -58,24 +59,24 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines)
     try {
       emphasisPartner = graph.config.emphasis.partner;
       // bis hier gekommen -> Schwerpunkbahn-Kords bereits gezeichnet ...
-      partnerCollection = [data[emphasisPartner].x,data[emphasisPartner].y];
-      partnerCollection.push([a, xOffset, yOffset]); // partner info mitschicken, also auch mein offset etc. ... für Verbindungs-Linien
-    } catch(e) {
+      if (emphasisRelation >= -1 && emphasisRelation <= 1) { // wenn innerhalb der beiden Kurvenpunkte
+        partnerCollection = [[data[emphasisPartner].x, data[emphasisPartner].y, [a, xOffset, yOffset]]]; // auf die des Partners setzen mit Extra-Infos
+      } else {
+        if (emphasisRelation < -1) { // zeichne Verbindungslinien zu Schwerpunktbahn + zum anderen satischen Partner --> weil wenn die Schwerpunkt-Bahn P überstreicht, die andere Linie verschwindet
+          partnerCollection = mainEmphasisCoords; // partner - Collection als endgültiges Array aber auch zum umwandeln der Schwerpunktbahnpunkte in ein geeignetes Array --> überträgt sich dann in sich selbst
+          partnerCollection.push([a, xOffset, yOffset]);
+          partnerCollection = [[data[emphasisPartner].x, data[emphasisPartner].y, [a, xOffset, yOffset]], partnerCollection];
+        } else { // sonst zeichne direkt zur Schwerpunktbahn Verbindungslinien
+          partnerCollection = mainEmphasisCoords;
+          partnerCollection.push([a, xOffset, yOffset]);
+          partnerCollection = [partnerCollection];
+        }
+      }
+    } catch (e) {
       emphasisPartner = undefined;
     }
     drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
   }
-  /*
-  // zeichne die Schwerpunkt-Kurve zuerst, damit sie hinter den anderen beiden Kurven ist, ... --> schönerer Effekt beim überlappen (emphasisRelation == 0 || 1)
-  let pCollection = [data.xP, data.yP];
-  let qCollection = [data.xQ, data.yQ];
-
-  let mainEmphasisCoords = getCoordsInRelation(pCollection, qCollection, emphasisRelation, true);
-  drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
-  // zeichne nun gegebene Koordinaten mit Verbindungslinien für P und Q
-  qCollection.push([a, xOffset, yOffset]); // als 3. Item - Skaling-Infos mitschicken von dem Verbindungsgraphen
-  drawCoords(data.xP, data.yP, a, xOffset, yOffset, "CIRCLE", [63, 136, 143], showConnectionLines ? qCollection : undefined);
-  drawCoords(data.xQ, data.yQ, a, xOffset, yOffset, "RECT", [255, 127, 80]);*/
 }
 
 
@@ -163,7 +164,7 @@ document.getElementById("editInput").addEventListener("click", () => { // für d
   mainModalFooterBtn2.addEventListener("click", clicked);
   mainModal.addEventListener('hidden.bs.modal', detectModalClose); // auf mainModal-Schließung hören um private listener zu entfernen + auch diesen wieder
   function clicked() { // neuen Input Wert setzen --> dabei wenn vorheriger Wert zu gr0 für neuen Bereich, reset auf neuen nähesten Wert
-    if (abs(inputRange.value) > abs(myInput.value)) { 
+    if (abs(inputRange.value) > abs(myInput.value)) {
       inputRange.value = inputRange.value >= 0 ? abs(myInput.value) : -abs(myInput.value);
       loadWithDefaults();
       rangeCounter.innerHTML = inputRange.value;
@@ -195,12 +196,12 @@ function getCoordsInRelation(collection1, collection2, relation, fixed) {
 
     let x1x2 = x2 - x1; // verschiebung zwischen einzelnen Koordinaten bestimmen
     let y1y2 = y2 - y1; // ""
-    let relativeMultiplicator = (parseFloat(relation/2)+0.5); // direkter Verschiebungsvektor
+    let relativeMultiplicator = (parseFloat(relation / 2) + 0.5); // direkter Verschiebungsvektor
     let newXC = x1x2 * relativeMultiplicator; // relation hinzufügen zu Verschiebungen --> +0.5 damit sich Mittelpunkt bei 0 befined & / 2 damit 1 / -1 die Endwerte für die Kurven sind und nicht deren abs == 0.5 ist --> allgemein nicht direkt Relation von P zu PQ genommen, damit man einen gleichen Bezugspunkt --> Mittelpunkt 0 zw. PQ
     let newYC = y1y2 * relativeMultiplicator; // ""
     fromPToQ = relativeMultiplicator; // direkter Verschiebungsvektor
     let rounded = Math.round(fromPToQ * 100) / 100; // damit nicht noch mal und nochmal ... berechnet
-    document.getElementById("rangeCounterFromP").innerHTML = rounded == fromPToQ ? fromPToQ + " (from P to Q)" : rounded+" (from P to Q) (~)"; // Math.round zum runden von 2 Dezimalsstellen, damit nicht zu große Zahlen, deswegen ~ wenn nicht identische Zahlen
+    document.getElementById("rangeCounterFromP").innerHTML = rounded == fromPToQ ? fromPToQ + " (from P to Q)" : rounded + " (from P to Q) (~)"; // Math.round zum runden von 2 Dezimalsstellen, damit nicht zu große Zahlen, deswegen ~ wenn nicht identische Zahlen
     let newX;
     let newY;
     if (fixed) {
@@ -239,13 +240,15 @@ function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
     lastY = newY;
 
     if (othersCords) { // Verbindungslinien zwischen den unterschiedlichen Kurven entstehend aus P und Q Koordinaten
-      // muss am Anfang stehen, damit es in den Hintergrund rückt
-      stroke(255, 255, 255);
-      let oA = othersCords[2][0]; // erst schön übersichtlich Daten aus Array übertragen
-      let oX = othersCords[2][1];
-      let oY = othersCords[2][2];
-      line(newX, newY, oA * othersCords[0][i] + oX, -oA * othersCords[1][i] + oY + oA / (1 + (oY / 1000)));
-      noStroke();
+      for (let o = 0; o < othersCords.length; ++o) { // alle Verbindungsgraphen durchgehen // vllt. später noch Farboptionen hinzufügen
+        // muss am Anfang stehen, damit es in den Hintergrund rückt
+        stroke(255, 255, 255);
+        let oA = othersCords[o][2][0]; // erst schön übersichtlich Daten aus Array übertragen
+        let oX = othersCords[o][2][1];
+        let oY = othersCords[o][2][2];
+        line(newX, newY, oA * othersCords[o][0][i] + oX, -oA * othersCords[o][1][i] + oY + oA / (1 + (oY / 1000)));
+        noStroke();
+      }
     }
 
     if (shape === "CIRCLE") {
@@ -266,12 +269,12 @@ function getCoords(data) {
   obj = {
     // template
     "1": {
-      x:[],
-      y:[]
+      x: [],
+      y: []
     },
     "2": {
-      x:[],
-      y:[]
+      x: [],
+      y: []
     }
   };
   let xP = obj["1"].x; // automatisch-übertragend
