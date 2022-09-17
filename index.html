@@ -10,6 +10,8 @@
 
   <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>-->
   <script src="externalLibs/p5.js"></script>
+  <script defer src="classes/bootstrapList.js"></script>
+  <script defer src="./modals.js"></script>
   <link rel="stylesheet" type="text/css" href="style.css" />
   <link rel="stylesheet" type="text/css" href="css/input.css" />
   <link rel="stylesheet" type="text/css" href="css/switches.css" />
@@ -17,9 +19,9 @@
 </head>
 
 <body class="noselect">
-  <div class="modal fade noselect" id="mainModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  <div class="modal fade noselect " id="mainModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog" id="modalDialog" role="document">
       <div id="mainModalContent" class="modal-content">
         <div id="mainModalHeader" class="modal-header">
           <h5 class="modal-title" id="mainModalTitle">Modal title</h5>
@@ -29,10 +31,54 @@
           </button>
         </div>
         <div id="mainModalText" class="modal-body">
-          <div id = "mainModalInputRange" class = "displayNone">
+          <div id="mainModalInputRange" class="displayNone">
             <div id="mainModalInputRangeNumberInputContainer" class="input-group mb-3 centered noselect">
               <span class="input-group-text" id="basic-addon3">absolute max range</span>
-              <input type="number" class="form-control" id="mainModalInputRangeNumberInput" aria-describedby="basic-addon3">
+              <input type="number" class="form-control" id="mainModalInputRangeNumberInput"
+                aria-describedby="basic-addon3">
+            </div>
+          </div>
+          <div id="mainModalSplitMode" class="displayNone">
+            <div id="listExampleWrapper" class="displayNone">
+              <a id="list_addRom_AExample" class="list-group-item list-group-item-action active selection hiddenOwn"
+                data-toggle="list" href="#list-home" role="tab" aria-controls="home">Home</a>
+            </div>
+            <div class="list-group" id="listGroupSplitMode" role="tablist">
+            </div>
+          </div>
+          <div id="mainModalCSVEdit" class="displayNone">
+            <div id="CSVTableDiv">
+              <table id="CSVTable" class="table table-striped table-dark">
+                <!--<thead> // template
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">First</th>
+                  <th scope="col">Last</th>
+                  <th scope="col">Handle</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Mark</td>
+                  <td>Otto</td>
+                  <td>@mdo</td>
+                </tr>
+                <tr>
+                  <th scope="row">2</th>
+                  <td>Jacob</td>
+                  <td>Thornton</td>
+                  <td>@fat</td>
+                </tr>
+                <tr>
+                  <th scope="row">3</th>
+                  <td>Larry</td>
+                  <td>the Bird</td>
+                  <td>@twitter</td>
+                </tr>
+              </tbody>
+            -->
+              </table>
             </div>
           </div>
         </div>
@@ -45,14 +91,19 @@
     </div>
   </div>
   <main>
-    <br class = "zoomFactor"/>
-    <div id="options" class = "zoomFactor">
+    <br class="zoomFactor" />
+    <div id="options" class="zoomFactor">
       <input type="range" id="inputByMe"
         title="slider to change supposed main emphasis point&#013;1. in relation to center of PQ where P is -1 and Q 1&#013;2. in relation to P where P = 0 and Q = 1"
         class="specifiedRange" min="-1" max="1" step="0.01" />
       <p id="rangeCounter">0.2</p>
-      <p id = "rangeCounterFromP">0.6 (from P to Q)</p>
+      <p id="rangeCounterFromP">0.6 (from P to Q)</p>
       <div class="chromeMaterial" id="editInput"></div>
+      <div id="uploadCSVDiv">
+        <div class="chromeMaterial" id="uploadCSV"></div>
+        <p id="uploadCSVText">upload csv</p>
+        <input type="file" accept=".csv" id="uploadInput" />
+      </div>
       <div class="toggle checkcross">
         <p id="switchText">show white lines</p>
         <input class="inputSwitch" id="checkcross" type="checkbox" /><label id="inputCheckSpecified" class="toggle-item"
@@ -62,10 +113,10 @@
       </div>
     </div>
 
-    <p class="footer first P" class = "zoomFactor">P - Cords</p>
-    <p class="footer first Q" class = "zoomFactor">Q - Cords</p>
-    <p class="footer second emphasis" class = "zoomFactor">supposed main emphasis curve ('S')</p>
-    <p class="footer third white" class = "zoomFactor">PQ - connection lines</p>
+    <p class="footer first P" class="zoomFactor">P - Cords</p>
+    <p class="footer first Q" class="zoomFactor">Q - Cords</p>
+    <p class="footer second emphasis" class="zoomFactor">supposed main emphasis curve ('S')</p>
+    <p class="footer third white" class="zoomFactor">PQ - connection lines</p>
 
 
   </main>

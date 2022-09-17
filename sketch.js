@@ -1,4 +1,125 @@
+// Listener und Stuff außerhalb von P5JS
+let showWhite = true;
+let showWhiteNow = false;
+// auf input change hören
+let inputRange = document.getElementById("inputByMe");
+inputRange.value = "0.2";
+let rangeCounter = document.getElementById("rangeCounter");
+inputRange.addEventListener('input', (event) => {
+  if (showWhite) {
+    showWhiteNow = true;
+  }
+  let val = inputRange.value;
+  rangeCounter.innerHTML = val;
+  loadWithDefaults(); // reload mit Relations-Wert & weiße Kurve einblenden / nicht einblenden
+  showWhiteNow = false;
+}); // input als id wurde von p5js reserviert / blockiert
 
+document.addEventListener('wheel', (event) => { // mouse scroll für resizing detecten in canvas von p5js
+  if (window.getComputedStyle(mainModal).display === "none") {
+    zoomFactor -= event.deltaY / 70;
+    loadWithDefaults();
+  }
+});
+
+let options = document.getElementById("options"); // auf Maus hover hören bei element (id === "options"), um Maus-Graphen-Dragging beim zB. Slider zu vermeiden
+options.mouseIsOver = false;
+options.onmouseover = function () {
+  this.mouseIsOver = true;
+};
+options.onmouseout = function () {
+  this.mouseIsOver = false;
+}
+
+
+document.addEventListener('mousedown', (event) => {
+  let dragOffsetX = xOffset - event.pageX; // um den Offset zum Graph XY Mittelpunkt und der Maus zu berechen
+  let dragOffsetY = yOffset - event.pageY;
+  document.addEventListener('mousemove', onMouseMove);
+  function onMouseMove(event) { // dragging erkennen um Diagramm auf (relativer) Maus-Position zu halten
+    if (!options.mouseIsOver && window.getComputedStyle(mainModal).display === "none") {
+      let newX = event.pageX + dragOffsetX; // offset addieren, damit der Graph sich 'smooth' bewegt
+      let newY = event.pageY + dragOffsetY;
+
+      xOffset = newX;
+      yOffset = newY;
+      loadWithDefaults();
+    }
+  }
+  document.addEventListener('mouseup', onMouseUp);
+  function onMouseUp() { // feuert jedes mal aber merkt man nicht .. --> weiße Kurve löschen & mouse mouse listener + mouseupListener löschen --> werden wieder erstellt
+    loadWithDefaults();
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+});
+// auf den switch-Input hören
+let inputSwitch = document.getElementById("checkcross");
+inputSwitch.addEventListener('input', (event) => {
+  showWhite = !showWhite;
+});
+
+let uploadInput = document.getElementById("uploadInput");
+// auf upload button click hören --> trigger file input
+document.getElementById("uploadCSV").addEventListener("click", () => {
+  uploadInput.click();
+})
+uploadInput.addEventListener("change", handleFiles, false);
+async function handleFiles(event) { // auf file input hören
+  let csvraw = await readCSV(event.target.files[0]);
+  if (csvraw) {
+    // modal anzeigen für den split - modus
+    showSplitOptionModal(csvraw);
+  } else {
+    alert("file must be a csv");
+  }
+  uploadInput.value = null;
+}
+
+function readCSV(file) {
+  return new Promise(resolve => { // Promise, da reader.onload async abläuft
+    // Überprüfen ob typ csv
+    try {
+      if (file.type && !file.type.startsWith('text/csv')) {
+        resolve(false);
+      }
+    } catch (e) {
+      resolve(false);
+    }
+
+    const reader = new FileReader(); // csv zu String überführen
+    reader.readAsText(file, "UTF-8")
+    reader.onload = function (evt) {
+      resolve(evt.target.result);
+    }
+  });
+}
+
+function CSVToArray(rawData, mode) {
+  let data = rawData.split('\n');
+  for (let i = 0; i < data.length; ++i) {
+    let elm = data[i];
+    elm = elm.split(mode);
+    data[i] = elm;
+  }
+  return data;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// P5JS - Syntax - Zeugs
 let zoomFactor = 100;
 let coordinates = presetCoordinates();
 function presetCoordinates() {
@@ -78,108 +199,6 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines)
     drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
   }
 }
-
-
-
-let showWhite = true;
-let showWhiteNow = false;
-// auf input change hören
-let inputRange = document.getElementById("inputByMe");
-inputRange.value = "0.2";
-let rangeCounter = document.getElementById("rangeCounter");
-inputRange.addEventListener('input', (event) => {
-  if (showWhite) {
-    showWhiteNow = true;
-  }
-  let val = inputRange.value;
-  rangeCounter.innerHTML = val;
-  loadWithDefaults(); // reload mit Relations-Wert & weiße Kurve einblenden / nicht einblenden
-  showWhiteNow = false;
-}); // input als id wurde von p5js reserviert / blockiert
-
-document.addEventListener('wheel', (event) => { // mouse scroll für resizing detecten in canvas von p5js
-  zoomFactor -= event.deltaY / 70;
-  loadWithDefaults();
-});
-
-let options = document.getElementById("options"); // auf Maus hover hören bei element (id === "options"), um Maus-Graphen-Dragging beim zB. Slider zu vermeiden
-options.mouseIsOver = false;
-options.onmouseover = function () {
-  this.mouseIsOver = true;
-};
-options.onmouseout = function () {
-  this.mouseIsOver = false;
-}
-
-
-document.addEventListener('mousedown', (event) => {
-  let dragOffsetX = xOffset - event.pageX; // um den Offset zum Graph XY Mittelpunkt und der Maus zu berechen
-  let dragOffsetY = yOffset - event.pageY;
-  document.addEventListener('mousemove', onMouseMove);
-  function onMouseMove(event) { // dragging erkennen um Diagramm auf (relativer) Maus-Position zu halten
-    if (!options.mouseIsOver && window.getComputedStyle(mainModal).display === "none") {
-      let newX = event.pageX + dragOffsetX; // offset addieren, damit der Graph sich 'smooth' bewegt
-      let newY = event.pageY + dragOffsetY;
-
-      xOffset = newX;
-      yOffset = newY;
-      loadWithDefaults();
-    }
-  }
-  document.addEventListener('mouseup', onMouseUp);
-  function onMouseUp() { // feuert jedes mal aber merkt man nicht .. --> weiße Kurve löschen & mouse mouse listener + mouseupListener löschen --> werden wieder erstellt
-    loadWithDefaults();
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
-  };
-});
-// auf den switch-Input hören
-let inputSwitch = document.getElementById("checkcross");
-inputSwitch.addEventListener('input', (event) => {
-  showWhite = !showWhite;
-});
-
-
-
-let mainModal = document.getElementById("mainModal");
-let mainModalTitle = document.getElementById("mainModalTitle");
-let mainModalFooterBtn1 = document.getElementById("mainModalFooterBtn1");
-let mainModalFooterBtn2 = document.getElementById("mainModalFooterBtn2");
-let mainModalInputRange = document.getElementById("mainModalInputRange");
-
-mainModal.addEventListener('hidden.bs.modal', detectModalClose); // auf modal-Schließung hören
-function detectModalClose() {
-  // modal resetten
-  mainModalFooterBtn1.style.display = "block";
-  mainModalFooterBtn2.style.display = "block";
-  mainModalInputRange.style.display = "none";
-}
-document.getElementById("editInput").addEventListener("click", () => { // für den input-range - Modal-Dialog
-  mainModalTitle.innerHTML = "set input range";
-  mainModalFooterBtn1.style.display = "none";
-  mainModalFooterBtn2.innerHTML = "apply";
-  mainModalInputRange.style.display = "block";
-  let myInput = document.getElementById("mainModalInputRangeNumberInput");
-  myInput.value = parseInt(inputRange.max);
-  mainModalFooterBtn2.addEventListener("click", clicked);
-  mainModal.addEventListener('hidden.bs.modal', detectModalClose); // auf mainModal-Schließung hören um private listener zu entfernen + auch diesen wieder
-  function clicked() { // neuen Input Wert setzen --> dabei wenn vorheriger Wert zu gr0 für neuen Bereich, reset auf neuen nähesten Wert
-    if (abs(inputRange.value) > abs(myInput.value)) {
-      inputRange.value = inputRange.value >= 0 ? abs(myInput.value) : -abs(myInput.value);
-      loadWithDefaults();
-      rangeCounter.innerHTML = inputRange.value;
-    }
-    inputRange.max = abs(myInput.value);
-    inputRange.min = - abs(myInput.value);
-  }
-  function detectModalClose() {
-    mainModalFooterBtn2.removeEventListener("click", clicked); // immer direkt löschen --> keine Doppelten bei neuen Klicks
-    mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
-  }
-
-  $('#mainModal').modal('show');
-})
-
 
 
 

@@ -2,10 +2,12 @@
   font-family: Sora;
   src: url('./externalFonts/Sora/Sora-VariableFont_wght.ttf');
 }
+
 @font-face {
   font-family: Material Icons;
   src: url('./externalFonts/GoogleMaterialIcons/MaterialIcons-Regular.ttf');
 }
+
 .chromeMaterial {
   font-family: 'Material Icons' !important;
   font-feature-settings: 'liga';
@@ -42,7 +44,8 @@ canvas {
   display: block;
 }
 
-.footer { /* zu spät aufgefallen, dass switches.css ebenfalls footer als class benutzt ...*/
+.footer {
+  /* zu spät aufgefallen, dass switches.css ebenfalls footer als class benutzt ...*/
   position: absolute;
 }
 
@@ -80,12 +83,14 @@ canvas {
 
 
 .displayNone {
-  display:none;
+  display: none;
 }
 
 #mainModalText {
+  height: 160px;
   white-space: pre;
   text-align: left;
+  overflow:none;
 }
 
 #mainModalHeader {
@@ -99,15 +104,79 @@ canvas {
 }
 
 #mainModalInputRangeNumberInputContainer {
-  top:-60px;
+  top: -50px;
 }
+
 #mainModalInputRange {
-  height:15px;
+  height: 15px;
 }
 
 #mainModalFooterBtn1 {
-  z-index:5 !important;
+  z-index: 5 !important;
 }
+
 #mainModalFooterBtn2 {
-  z-index:5 !important;
+  z-index: 5 !important;
+}
+
+#mainModalSplitMode {
+  height: 0px;
+}
+
+#listGroupSplitMode {
+  margin-top: -120px;
+}
+
+
+
+
+
+
+
+
+#uploadCSVDiv {
+  position: absolute;
+  left: 730px;
+  top: 27px;
+}
+
+#uploadCSV {
+  font-size: 24px;
+  color: white;
+  cursor: pointer
+}
+
+#uploadCSV:before {
+  content: '\E2C6';
+}
+
+#uploadCSV:hover {
+  color: #2497E3 !important;
+}
+
+#uploadCSVText {
+  position: relative;
+  color: white;
+  font-size: 15px;
+  left: -89px;
+  top: 8px;
+}
+
+#uploadInput {
+  display: none
+}
+
+#CSVTable {
+  margin-top:-48px;
+}
+@-moz-document url-prefix() {
+  #CSVTable {
+    margin-top: -83px;
+  }
+}
+
+#CSVTableDiv {
+  margin-top:-150px;
+  max-height: 574px;
+  overflow:auto;
 }
