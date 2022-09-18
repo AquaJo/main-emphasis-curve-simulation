@@ -145,20 +145,21 @@ createButtonCsvEdit.addEventListener("click", () => {
 let csvTableDiv = document.getElementById("CSVTableDiv");
 // automatisches scrollen bei Tabellen-Div aktivieren
 let scrollMode = null;
-
+let scrollSpeed = 1;
+let scrollSpeedBase = 6; // = max. Scroll-Speed
 csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus herausfinden + while Schleife für scrollen
     let bounds = csvTableDiv.getBoundingClientRect();
     //console.log(bounds);
     let y = event.pageY;
     let x = event.pageX;
     let offset = 50;
-    let scrollSpeed = 1.5;
 
     let downScrollInterval;
     let upScrollInterval;
     let leftScrollInterval;
     let rightScrollInterval;
     if (y > bounds.bottom - offset) {
+        scrollSpeed = scrollSpeedBase * (1- (bounds.bottom - y)/offset); // scrollSpeedBase mit multiplikator von 0-1 spielen lassen
         if (scrollMode !== "bottom") {
             scrollMode = "bottom";
             downScrollInterval = setInterval(downScrolling, 7); // (!)
@@ -171,6 +172,7 @@ csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus h
             }
         }
     } else if (y < bounds.top + offset) {
+        scrollSpeed = scrollSpeedBase * (1- (y - bounds.top)/offset);
         if (scrollMode !== "top") {
             scrollMode = "top";
             upScrollInterval = setInterval(upScrolling, 7); // (!)
@@ -183,6 +185,7 @@ csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus h
             }
         }
     } else if (x > bounds.right - offset) {
+        scrollSpeed = scrollSpeedBase * (1- (bounds.right - x)/offset);
         if (scrollMode !== "right") {
             scrollMode = "right";
             rightScrollInterval = setInterval(rightScrolling, 7); // (!)
@@ -195,6 +198,7 @@ csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus h
             }
         }
     } else if (x < bounds.left + offset) {
+        scrollSpeed = scrollSpeedBase * (1- (x - bounds.left)/offset);
         if (scrollMode !== "left") {
             scrollMode = "left";
             leftScrollInterval = setInterval(leftScrolling, 7); // (!)
