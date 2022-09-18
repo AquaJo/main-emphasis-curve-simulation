@@ -23,6 +23,7 @@ function detectModalClose() {
     if (!csvTable.classList.contains("table-striped")) {
         csvTable.classList.add("table-striped");
     }
+    csvEditContinueBtn.style.display = "none";
 }
 document.getElementById("editInput").addEventListener("click", () => { // für den input-range - Modal-Dialog
     mainModalTitle.innerHTML = "set input range";
@@ -102,6 +103,7 @@ function showSplitOptionModal(rawData) {
 let CSVArray;
 
 
+
 let graphNames = [];
 function showCSVEditModal() {
     graphNames = [];
@@ -121,8 +123,10 @@ function showCSVEditModal() {
 }
 
 let createButtonCsvEdit = document.getElementById("btn_createNewGraph");
+let csvEditContinueBtn = document.getElementById("btn_csvEditContinue");
 
 createButtonCsvEdit.addEventListener("click", () => {
+    csvEditContinueBtn = document.getElementById("btn_csvEditContinue"); // wegen replace
     if (!(createButtonCsvEdit.innerHTML === "Cancle")) {
         createButtonCsvEdit.innerHTML = "Cancle";
         let graphName = prompt("Please add a graph name for simplicity");
@@ -134,13 +138,54 @@ createButtonCsvEdit.addEventListener("click", () => {
             csvTable.classList.remove("table-striped");
             alert("now choose x - coordinates from one column for your graph, " + graphName + ", by clicking table elements");
             csvTableAddListeners("mainTable", CSVArray);
+            csvEditContinueBtn.style.display = "block";
+            csvEditContinueBtn.addEventListener("click", continueClicked);
+            function continueClicked() {
+                if (checkNumbers(getTableResultFromArray("mainTable", CSVArray))) {
+                    alert("now select y-values for your graph, " + graphName);
+                } else {
+                    alert("please only select numbers type float");
+                }
+                setFullTableToBackground("mainTable", CSVArray, [33, 37, 41]);
+            }
+            mainModal.addEventListener('hidden.bs.modal', detectModalClose);
+            function detectModalClose() {
+                mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
+                csvEditContinueBtn.removeEventListener("click", continueClicked);
+            }
         } else {
-            createButtonCsvEdit.innerHTML = "Create new Graph";
+            cancle();
         }
     } else {
-        console.log(getTableResultFromArray("mainTable", CSVArray));
+        cancle()
+    }
+    function cancle() {
+        setFullTableToBackground("mainTable", CSVArray, [33, 37, 41]);
+        if (!csvTable.classList.contains("table-striped")) {
+            csvTable.classList.add("table-striped");
+        }
+        createButtonCsvEdit.innerHTML = "Create new Graph";
+        csvEditContinueBtn.style.display = "none";
+        mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
+        //csvEditContinueBtn.removeEventListener("click", continueClicked); --> copy damit funktioniert
+        let elClone = csvEditContinueBtn.cloneNode(true);
+
+        csvEditContinueBtn.parentNode.replaceChild(elClone, csvEditContinueBtn);
+        csvTableAddListeners("mainTable", CSVArray, true)
     }
 })
+function checkNumbers(array) {
+    if (array.length > 0) {
+        for (let i = 0; i < array.length; ++i) {
+            if (isNaN(parseFloat(array[i]))) {
+                return false;
+            }
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
 
 let csvTableDiv = document.getElementById("CSVTableDiv");
 // automatisches scrollen bei Tabellen-Div aktivieren
@@ -159,7 +204,7 @@ csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus h
     let leftScrollInterval;
     let rightScrollInterval;
     if (y > bounds.bottom - offset) {
-        scrollSpeed = scrollSpeedBase * (1- (bounds.bottom - y)/offset); // scrollSpeedBase mit multiplikator von 0-1 spielen lassen
+        scrollSpeed = scrollSpeedBase * (1 - (bounds.bottom - y) / offset); // scrollSpeedBase mit multiplikator von 0-1 spielen lassen
         if (scrollMode !== "bottom") {
             scrollMode = "bottom";
             downScrollInterval = setInterval(downScrolling, 7); // (!)
@@ -172,7 +217,7 @@ csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus h
             }
         }
     } else if (y < bounds.top + offset) {
-        scrollSpeed = scrollSpeedBase * (1- (y - bounds.top)/offset);
+        scrollSpeed = scrollSpeedBase * (1 - (y - bounds.top) / offset);
         if (scrollMode !== "top") {
             scrollMode = "top";
             upScrollInterval = setInterval(upScrolling, 7); // (!)
@@ -185,7 +230,7 @@ csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus h
             }
         }
     } else if (x > bounds.right - offset) {
-        scrollSpeed = scrollSpeedBase * (1- (bounds.right - x)/offset);
+        scrollSpeed = scrollSpeedBase * (1 - (bounds.right - x) / offset);
         if (scrollMode !== "right") {
             scrollMode = "right";
             rightScrollInterval = setInterval(rightScrolling, 7); // (!)
@@ -198,7 +243,7 @@ csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus h
             }
         }
     } else if (x < bounds.left + offset) {
-        scrollSpeed = scrollSpeedBase * (1- (x - bounds.left)/offset);
+        scrollSpeed = scrollSpeedBase * (1 - (x - bounds.left) / offset);
         if (scrollMode !== "left") {
             scrollMode = "left";
             leftScrollInterval = setInterval(leftScrolling, 7); // (!)
@@ -231,9 +276,12 @@ function csvTableAddListeners(key, array, remove) { // key vom Erstellen des Tab
             for (let j = 0; j < longestElm; ++j) {
                 let element = document.getElementById(key + "_tableTD-" + i + "," + j);
                 if (element) {
-                    element.removeEventListener("mouseover", mouseOver);
+                    let elClone = element.cloneNode(true);
+
+                    element.parentNode.replaceChild(elClone, element); // durch copy ersetzen um listener zu löschen
+                    /*element.removeEventListener("mouseover", mouseOver); // hat nicht funktioniert methoden vermutlich nicht erreichbar
                     element.removeEventListener("mouseleave", mouseLeave);
-                    element.removeEventListener("mousedown", mouseDownEvent);
+                    element.removeEventListener("mousedown", mouseDownEvent);*/
                 }
             }
         }
@@ -256,7 +304,7 @@ function csvTableAddListeners(key, array, remove) { // key vom Erstellen des Tab
                     function mouseOver() {
                         mouseOverStill = true;
                         if (mouseDown) {
-                            let backgroundColor = window.getComputedStyle(element).backgroundColor
+                            let backgroundColor = window.getComputedStyle(element).backgroundColor;
                             if (backgroundColor === "rgb(11,94,215)" || backgroundColor === "rgb(11, 94, 215)") {
                                 element.style.backgroundColor = backgroundColorBefore;
                             } else {
@@ -272,7 +320,7 @@ function csvTableAddListeners(key, array, remove) { // key vom Erstellen des Tab
                     element.addEventListener("mousedown", mouseDownEvent);
                     function mouseDownEvent() {
                         if (mouseOverStill) {
-                            let backgroundColor = window.getComputedStyle(element).backgroundColor
+                            let backgroundColor = window.getComputedStyle(element).backgroundColor;
                             if (backgroundColor === "rgb(11,94,215)" || backgroundColor === "rgb(11, 94, 215)") {
                                 element.style.backgroundColor = backgroundColorBefore;
                             } else {
@@ -300,7 +348,23 @@ function csvTableAddListeners(key, array, remove) { // key vom Erstellen des Tab
         }
     }
 }
-
+function setFullTableToBackground(key, array, color) {
+    let longestElm = 0;
+    array.forEach((elm) => { // einaml durchlaufen um längstes array herauszufinden
+        if (elm.length > longestElm) {
+            longestElm = elm.length;
+        }
+    })
+    let res = [];
+    for (let i = 0; i < array.length; ++i) {
+        for (let j = 0; j < longestElm; ++j) {
+            let element = document.getElementById(key + "_tableTD-" + i + "," + j);
+            if (element) {
+                element.style.backgroundColor = "rgb(" + color[0] + ", " + color[1] + ", " + color[2] + ")";
+            }
+        }
+    }
+}
 function getTableResultFromArray(key, array) { // return alle markierten items der Reihe
     let longestElm = 0;
     array.forEach((elm) => { // einaml durchlaufen um längstes array herauszufinden

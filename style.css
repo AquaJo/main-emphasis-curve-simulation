@@ -199,3 +199,9 @@ canvas {
   top: -165px;
   left: 499px;
 }
+
+#btn_csvEditContinue {
+  position:relative;
+  margin-left:110px;
+  margin-top:-62px;
+}
