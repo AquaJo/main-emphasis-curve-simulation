@@ -1,4 +1,3 @@
-
 let mainModal = document.getElementById("mainModal");
 let mainModalText = document.getElementById("mainModalText");
 let mainModalTitle = document.getElementById("mainModalTitle");
@@ -8,6 +7,7 @@ let mainModalInputRange = document.getElementById("mainModalInputRange");
 let mainModalSplitMode = document.getElementById("mainModalSplitMode");
 let mainModalCSVEdit = document.getElementById("mainModalCSVEdit");
 let modalDialog = document.getElementById("modalDialog");
+let csvTable = document.getElementById("CSVTable")
 mainModal.addEventListener('hidden.bs.modal', detectModalClose); // auf modal-Schließung hören
 function detectModalClose() {
     // modal resetten
@@ -19,6 +19,10 @@ function detectModalClose() {
     mainModalText.style.height = "160px";
     mainModalText.style.overflow = "none";
     modalDialog.classList.remove("modal-lg");
+    createButtonCsvEdit.innerHTML = "Create new Graph";
+    if (!csvTable.classList.contains("table-striped")) {
+        csvTable.classList.add("table-striped");
+    }
 }
 document.getElementById("editInput").addEventListener("click", () => { // für den input-range - Modal-Dialog
     mainModalTitle.innerHTML = "set input range";
@@ -81,12 +85,13 @@ function showSplitOptionModal(rawData) {
         }
 
         csvArray = CSVToArray(rawData, mode);
+        CSVArray = csvArray;
     }
     function detectModalClose() {
         mainModalFooterBtn2.removeEventListener("click", clicked); // immer direkt löschen --> keine Doppelten bei neuen Klicks
         mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
         if (csvArray) { // zeight an ob geklcikt wurde oder nicht
-            showCSVEditModal(csvArray); // hier aufrufen, da innerhalb clicked() zu früh ist um selbigen Modal neu aufzurufen ohne unzuverlässigen timeout
+            showCSVEditModal(); // hier aufrufen, da innerhalb clicked() zu früh ist um selbigen Modal neu aufzurufen ohne unzuverlässigen timeout
         }
     }
 
@@ -94,20 +99,227 @@ function showSplitOptionModal(rawData) {
     $('#mainModal').modal('show');
 }
 
-function showCSVEditModal(csvArray) {
+let CSVArray;
+
+
+let graphNames = [];
+function showCSVEditModal() {
+    graphNames = [];
     mainModalTitle.innerHTML = "set graphs from csv";
     mainModalCSVEdit.style.display = "block";
     mainModalText.style.height = (screen.availHeight * 0.7).toString() + "px";
     mainModalFooterBtn2.innerHTML = "Create";
     mainModalFooterBtn1.innerHTML = "Cancel";
     modalDialog.classList.add("modal-lg");
-    mainModalText.style.overflow;
-    arrayToBootstrapTable(csvArray, document.getElementById("CSVTable"));
+    arrayToBootstrapTable(CSVArray, document.getElementById("CSVTable"), "mainTable");
     $('#mainModal').modal('show');
-
+    mainModal.addEventListener('hidden.bs.modal', detectModalClose);
+    function detectModalClose() {
+        mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
+        csvTableAddListeners("mainTable", CSVArray, true);
+    }
 }
 
-function arrayToBootstrapTable(tableElm, bootstrapElm) {
+let createButtonCsvEdit = document.getElementById("btn_createNewGraph");
+
+createButtonCsvEdit.addEventListener("click", () => {
+    if (!(createButtonCsvEdit.innerHTML === "Cancle")) {
+        createButtonCsvEdit.innerHTML = "Cancle";
+        let graphName = prompt("Please add a graph name for simplicity");
+        while (graphNames.includes(graphName)) {
+            alert("name already exists, please choose a different one");
+            graphName = prompt("Please add a graph name for simplicity");
+        }
+        if (graphName !== null) {
+            csvTable.classList.remove("table-striped");
+            alert("now choose x - coordinates from one column for your graph, " + graphName + ", by clicking table elements");
+            csvTableAddListeners("mainTable", CSVArray);
+        } else {
+            createButtonCsvEdit.innerHTML = "Create new Graph";
+        }
+    } else {
+        console.log(getTableResultFromArray("mainTable", CSVArray));
+    }
+})
+
+let csvTableDiv = document.getElementById("CSVTableDiv");
+// automatisches scrollen bei Tabellen-Div aktivieren
+let scrollMode = null;
+
+csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus herausfinden + while Schleife für scrollen
+    let bounds = csvTableDiv.getBoundingClientRect();
+    //console.log(bounds);
+    let y = event.pageY;
+    let x = event.pageX;
+    let offset = 50;
+    let scrollSpeed = 1.5;
+
+    let downScrollInterval;
+    let upScrollInterval;
+    let leftScrollInterval;
+    let rightScrollInterval;
+    if (y > bounds.bottom - offset) {
+        if (scrollMode !== "bottom") {
+            scrollMode = "bottom";
+            downScrollInterval = setInterval(downScrolling, 7); // (!)
+            function downScrolling() {
+                if (scrollMode === "bottom" && mouseDown) {
+                    csvTableDiv.scrollBy({ top: scrollSpeed });
+                } else {
+                    clearInterval(downScrollInterval);
+                }
+            }
+        }
+    } else if (y < bounds.top + offset) {
+        if (scrollMode !== "top") {
+            scrollMode = "top";
+            upScrollInterval = setInterval(upScrolling, 7); // (!)
+            function upScrolling() {
+                if (scrollMode === "top" && mouseDown) {
+                    csvTableDiv.scrollBy({ top: -scrollSpeed });
+                } else {
+                    clearInterval(upScrollInterval);
+                }
+            }
+        }
+    } else if (x > bounds.right - offset) {
+        if (scrollMode !== "right") {
+            scrollMode = "right";
+            rightScrollInterval = setInterval(rightScrolling, 7); // (!)
+            function rightScrolling() {
+                if (scrollMode === "right" && mouseDown) {
+                    csvTableDiv.scrollBy({ left: scrollSpeed });
+                } else {
+                    clearInterval(rightScrollInterval);
+                }
+            }
+        }
+    } else if (x < bounds.left + offset) {
+        if (scrollMode !== "left") {
+            scrollMode = "left";
+            leftScrollInterval = setInterval(leftScrolling, 7); // (!)
+            function leftScrolling() {
+                if (scrollMode === "left" && mouseDown) {
+                    csvTableDiv.scrollBy({ left: -scrollSpeed });
+                } else {
+                    clearInterval(leftScrollInterval);
+                }
+            }
+        }
+    } else {
+        scrollMode = null;
+    }
+})
+
+//
+// events for csvTableAddListeners
+
+function csvTableAddListeners(key, array, remove) { // key vom Erstellen des Tables benötigt, + array mit dem gearbeitet wurde
+    let currentRow = 0;
+    if (remove) { // wahrscheinlich nicht umbedingt benötigt --> listener werden eh durch ersetzten der Elemente gelöscht
+        let longestElm = 0;
+        array.forEach((elm) => { // einaml durchlaufen um längstes array herauszufinden
+            if (elm.length > longestElm) {
+                longestElm = elm.length;
+            }
+        })
+        for (let i = 0; i < array.length; ++i) {
+            for (let j = 0; j < longestElm; ++j) {
+                let element = document.getElementById(key + "_tableTD-" + i + "," + j);
+                if (element) {
+                    element.removeEventListener("mouseover", mouseOver);
+                    element.removeEventListener("mouseleave", mouseLeave);
+                    element.removeEventListener("mousedown", mouseDownEvent);
+                }
+            }
+        }
+    } else {
+
+        let longestElm = 0;
+        array.forEach((elm) => { // einaml durchlaufen um längstes array herauszufinden
+            if (elm.length > longestElm) {
+                longestElm = elm.length;
+            }
+        })
+
+        for (let i = 0; i < array.length; ++i) {
+            for (let j = 0; j < longestElm; ++j) {
+                let element = document.getElementById(key + "_tableTD-" + i + "," + j);
+                if (element) {
+                    let backgroundColorBefore = getComputedStyle(element).backgroundColor;
+                    element.addEventListener("mouseover", mouseOver);
+                    let mouseOverStill = false;
+                    function mouseOver() {
+                        mouseOverStill = true;
+                        if (mouseDown) {
+                            let backgroundColor = window.getComputedStyle(element).backgroundColor
+                            if (backgroundColor === "rgb(11,94,215)" || backgroundColor === "rgb(11, 94, 215)") {
+                                element.style.backgroundColor = backgroundColorBefore;
+                            } else {
+                                element.style.backgroundColor = "rgb(11,94,215)";
+                                checkColumns(element.id);
+                            }
+                        }
+                    }
+                    element.addEventListener("mouseleave", mouseLeave);
+                    function mouseLeave() {
+                        mouseOverStill = false;
+                    }
+                    element.addEventListener("mousedown", mouseDownEvent);
+                    function mouseDownEvent() {
+                        if (mouseOverStill) {
+                            let backgroundColor = window.getComputedStyle(element).backgroundColor
+                            if (backgroundColor === "rgb(11,94,215)" || backgroundColor === "rgb(11, 94, 215)") {
+                                element.style.backgroundColor = backgroundColorBefore;
+                            } else {
+                                element.style.backgroundColor = "rgb(11,94,215)";
+                                checkColumns(element.id);
+                            }
+                        }
+                    }
+                    function checkColumns(id) {
+                        let mainArrInd = parseInt(id.split("-")[1].split(",")[0]);
+                        let subArrInd = parseInt(id.split("-")[1].split(",")[1]);
+                        if (subArrInd != currentRow) {
+                            // set background to backgroundColorBefore for all items of column before
+                            for (let i = 0; i < array.length; ++i) {
+                                let element = document.getElementById(key + "_tableTD-" + i + "," + currentRow);
+                                if (element) {
+                                    element.style.backgroundColor = backgroundColorBefore;
+                                }
+                            }
+                            currentRow = subArrInd;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+function getTableResultFromArray(key, array) { // return alle markierten items der Reihe
+    let longestElm = 0;
+    array.forEach((elm) => { // einaml durchlaufen um längstes array herauszufinden
+        if (elm.length > longestElm) {
+            longestElm = elm.length;
+        }
+    })
+    let res = [];
+    for (let i = 0; i < array.length; ++i) {
+        for (let j = 0; j < longestElm; ++j) {
+            let element = document.getElementById(key + "_tableTD-" + i + "," + j);
+            if (element) {
+                let backgroundColor = window.getComputedStyle(element).backgroundColor;
+                if (backgroundColor === "rgb(11,94,215)" || backgroundColor === "rgb(11, 94, 215)") {
+                    res.push(array[i][j]);
+                }
+            }
+        }
+    }
+    return res;
+}
+
+function arrayToBootstrapTable(tableElm, bootstrapElm, key) {
     // alle children von parent entfernen
     try { // wenn noch keine elemente vorhaben --> 1 . Mal
         [...bootstrapElm.childNodes].forEach(el => el.remove());
@@ -121,42 +333,26 @@ function arrayToBootstrapTable(tableElm, bootstrapElm) {
         }
     })
     let tbody = document.createElement("tbody");
-    for (let i = 0; i < tableElm.length; ++i) {
+    for (let i = -1; i < tableElm.length; ++i) {
+        let tr = document.createElement("tr");
+        let th = document.createElement("th");
+        th.setAttribute("scope", "row");
+        th.innerHTML = i + 1; // Zeilenindex
+        tr.appendChild(th);
         if (i == -1) {
-            // Title der einzelnen Spalten setzen
-            let thead = document.createElement("thead"); // einzelne Elemente erstellen + an die parents anhängen
-            let tr = document.createElement("tr");
-            let th = document.createElement("th");
-            th.innerHTML = "#";
-            th.setAttribute("scope", "col");
-            tr.appendChild(th);
-            tableElm[i].forEach((data) => {
-                th = document.createElement("th");
-                th.innerHTML = data === "" || data === "\r" ? "-" : data;
+            for (let i = 0; i < longestElm; ++i) {
+                let th = document.createElement("th");
                 th.setAttribute("scope", "col");
+                th.innerHTML = i + 1;
                 tr.appendChild(th);
-            });
-            let headerLength = tableElm[i].length;
-            if (headerLength < longestElm) { // mögliche Lücken füllen
-                for (let i = 0; i < longestElm - headerLength; ++i) {
-                    th = document.createElement("th");
-                    th.innerHTML = "-";
-                    th.setAttribute("scope", "col");
-                    tr.appendChild(th);
-                }
+                tbody.appendChild(tr);
             }
-            thead.appendChild(tr)
-            bootstrapElm.appendChild(thead);
         } else {
-            let tr = document.createElement("tr");
-            let th = document.createElement("th");
-            th.setAttribute("scope", "row");
-            th.innerHTML = i; // Zeilenindex
-            tr.appendChild(th);
-
-            tableElm[i].forEach((data) => {
+            tableElm[i].forEach((data, index) => {
                 let td = document.createElement("td");
                 td.innerHTML = data === "" || data === "\r" ? "-" : data;
+                td.setAttribute("scope", "row");
+                td.setAttribute("id", td.innerHTML === "-" ? key + "_tableTDNotNeeded" : key + "_tableTD-" + i + "," + index); // id setzen um später mit listener arbeiten zu können --> y,x --> Array Element, Array Element in parent Array
                 tr.appendChild(td);
             });
 

@@ -90,7 +90,7 @@ canvas {
   height: 160px;
   white-space: pre;
   text-align: left;
-  overflow:none;
+  overflow: hidden;
 }
 
 #mainModalHeader {
@@ -167,8 +167,9 @@ canvas {
 }
 
 #CSVTable {
-  margin-top:-48px;
+  margin-top: -48px;
 }
+
 @-moz-document url-prefix() {
   #CSVTable {
     margin-top: -83px;
@@ -176,7 +177,25 @@ canvas {
 }
 
 #CSVTableDiv {
-  margin-top:-150px;
-  max-height: 574px;
-  overflow:auto;
+  margin-top: -150px;
+  max-height: 410px;
+  overflow: auto;
+}
+
+
+
+#btn_createNewGraph {
+  margin-left: -40px;
+}
+
+#CSVEditInputXContainerDiv {
+  width: 33%;
+  top: -63px;
+  left: 215px;
+}
+
+#CSVEditInputYContainerDiv {
+  width: 33%;
+  top: -165px;
+  left: 499px;
 }

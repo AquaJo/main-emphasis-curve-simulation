@@ -31,8 +31,9 @@ options.onmouseout = function () {
   this.mouseIsOver = false;
 }
 
-
+let mouseDown;
 document.addEventListener('mousedown', (event) => {
+  mouseDown = true;
   let dragOffsetX = xOffset - event.pageX; // um den Offset zum Graph XY Mittelpunkt und der Maus zu berechen
   let dragOffsetY = yOffset - event.pageY;
   document.addEventListener('mousemove', onMouseMove);
@@ -48,6 +49,7 @@ document.addEventListener('mousedown', (event) => {
   }
   document.addEventListener('mouseup', onMouseUp);
   function onMouseUp() { // feuert jedes mal aber merkt man nicht .. --> weiße Kurve löschen & mouse mouse listener + mouseupListener löschen --> werden wieder erstellt
+    mouseDown = false;
     loadWithDefaults();
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);
