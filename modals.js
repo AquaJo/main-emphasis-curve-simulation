@@ -136,22 +136,17 @@ createButtonCsvEdit.addEventListener("click", () => {
         }
         if (graphName !== null) {
             csvTable.classList.remove("table-striped");
-            alert("now choose x - coordinates from one column for your graph, " + graphName + ", by clicking table elements");
+            alert("Now choose x - coordinates from one column for your graph, " + graphName + ", by clicking table cells");
             csvTableAddListeners("mainTable", CSVArray);
             csvEditContinueBtn.style.display = "block";
             csvEditContinueBtn.addEventListener("click", continueClicked);
             function continueClicked() {
                 if (checkNumbers(getTableResultFromArray("mainTable", CSVArray))) {
-                    alert("now select y-values for your graph, " + graphName);
+                    alert("Now select y-values for your graph, " + graphName);
                 } else {
-                    alert("please only select numbers type float");
+                    alert("Please only select numbers type float");
                 }
                 setFullTableToBackground("mainTable", CSVArray, [33, 37, 41]);
-            }
-            mainModal.addEventListener('hidden.bs.modal', detectModalClose);
-            function detectModalClose() {
-                mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
-                csvEditContinueBtn.removeEventListener("click", continueClicked);
             }
         } else {
             cancle();
@@ -166,19 +161,28 @@ createButtonCsvEdit.addEventListener("click", () => {
         }
         createButtonCsvEdit.innerHTML = "Create new Graph";
         csvEditContinueBtn.style.display = "none";
-        mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
         //csvEditContinueBtn.removeEventListener("click", continueClicked); --> copy damit funktioniert
         let elClone = csvEditContinueBtn.cloneNode(true);
 
         csvEditContinueBtn.parentNode.replaceChild(elClone, csvEditContinueBtn);
         csvTableAddListeners("mainTable", CSVArray, true)
     }
+    mainModal.addEventListener('hidden.bs.modal', detectModalClose);
+    function detectModalClose() {
+        mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
+        cancle();
+    }
 })
 function checkNumbers(array) {
     if (array.length > 0) {
         for (let i = 0; i < array.length; ++i) {
-            if (isNaN(parseFloat(array[i]))) {
+            let item = array[i];
+            item = item.replaceAll(",",".");
+            let num = parseFloat(item);
+            if (isNaN(num)) {
                 return false;
+            } else {
+                console.log("accepted: "+num);
             }
         }
         return true;
