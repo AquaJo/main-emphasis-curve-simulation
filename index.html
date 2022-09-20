@@ -82,6 +82,8 @@
             </div>
             <button id="btn_createNewGraph" type="button" class="btn btn-primary">Create new Graph</button>
             <button id="btn_csvEditContinue"  type="button" class="btn btn-primary displayNone">Continue</button>
+            <div class="list-group" id="csvEditListGroup" role="tablist">
+            </div>
             <!--
             <div id="CSVEditInputXContainerDiv" class="input-group mb-3 centered noselect">
               <span class="input-group-text" id="basic-addon3">colum for x</span>
@@ -93,10 +95,6 @@
                 aria-describedby="basic-addon3" value = "2">
             </div>
           -->
-            <div id="graphsListCSVEdit">
-              <div class="list-group" id="listGroupCSVEdit" role="tablist">
-              </div>
-            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -134,7 +132,7 @@
     <p class="footer first Q" class="zoomFactor">Q - Cords</p>
     <p class="footer second emphasis" class="zoomFactor">supposed main emphasis curve ('S')</p>
     <p class="footer third white" class="zoomFactor">PQ - connection lines</p>
-
+    <p class="footer fourth step" class="zoomFactor">step = .5 (currently not changable)</p>
 
   </main>
   <script src="sketch.js"></script>

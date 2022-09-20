@@ -50,15 +50,19 @@ canvas {
 }
 
 .footer.first {
-  top: 310px;
+  top: 370px;
 }
 
 .footer.second {
-  top: 330px;
+  top: 393px;
 }
 
 .footer.third {
-  top: 353px;
+  top: 416px;
+}
+
+.footer.fourth {
+  top: 439px;
 }
 
 .footer.P {
@@ -76,10 +80,20 @@ canvas {
   left: -20px;
 }
 
+.footer.step {
+  color: rgb(254, 44, 84);
+  left: -20px;
+}
+
 .footer.white {
   color: white;
   left: -20px;
 }
+
+
+
+
+
 
 
 .displayNone {
@@ -201,7 +215,30 @@ canvas {
 }
 
 #btn_csvEditContinue {
-  position:relative;
-  margin-left:110px;
-  margin-top:-62px;
+  position: relative;
+  margin-left: 110px;
+  margin-top: -62px;
+}
+
+
+#csvEditListGroup {
+  max-height: 210px;
+  overflow: auto;
+  margin-top: -25px;
+}
+
+#csvEditListGroup a {
+  background-color: rgb(33, 37, 41);
+  border-color: rgb(33, 37, 41);
+}
+
+
+*,
+*::after,
+*::before {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
 }

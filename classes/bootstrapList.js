@@ -55,6 +55,12 @@ class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht 
             }
         })
     }
+    activate() {
+        if (!this.element.classList.contains("active")) {
+            this.element.classList.add("active");
+            this.element.classList.remove("normal");
+        }
+    }
     deactivate() {
         if (this.element.classList.contains("active")) {
             this.element.classList.remove("active");

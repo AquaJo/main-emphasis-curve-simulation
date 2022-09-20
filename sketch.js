@@ -175,6 +175,31 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines)
       emphasisPartner = undefined;
     }
   }
+  let smallestX;
+  let highestX;
+  let smallestY;
+  let highestY;
+  for (let graphKey in data) { // höchste, niedrigste xy koords bestimmen --> ginge auch über concat ...
+    let graph = data[graphKey];
+    let smallestXF = Math.min(...graph.x);
+    let highestXF = Math.max(...graph.x);
+    let smallestYF = Math.min(...graph.y);
+    let highestYF = Math.max(...graph.y);
+    if (smallestX === undefined || smallestXF < smallestX) {
+      smallestX = smallestXF;
+    }
+    if (highestX === undefined || highestXF > highestX) {
+      highestX = highestXF;
+    }
+    if (smallestY === undefined || smallestYF < smallestY) {
+      smallestY = smallestYF;
+    }
+    if (highestY === undefined || highestYF > highestY) {
+      highestY = highestYF;
+    }
+  }
+  //alert(smallestX + " " + highestX + " " + smallestY + " " + highestY);
+  drawAxes(smallestX, highestX, smallestY, highestY, a, xOffset, yOffset, 0.5); // vorher Achsen zeichnen
   for (let graphKey in data) { // key entspricht 1 Object mit x für x-Kords und y für y-Kords
     let graph = data[graphKey];
     let emphasisPartner;
@@ -202,7 +227,85 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines)
   }
 }
 
+function drawAxes(smallestX, highestX, smallestY, highestY, a, offsetX, offsetY, step) {
+  let newXS = a * smallestX + offsetX; // offset etc anwenden
+  let newYS = -a * smallestY + offsetY + a / (1 + offsetY / 1000); // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
+  let newXH = a * highestX + offsetX; // offset etc anwenden
+  let newYH = -a * highestY + offsetY + a / (1 + offsetY / 1000); // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
+  let y0 = offsetY + a / (1 + offsetY / 1000);
+  let x0 = offsetX;
+  // endende Axenbereiche wenn nötig erweitern
+  stroke(100,149,237);
+  if (highestX < 0) {
+    line(newXH, y0, x0, y0);
+  }
+  if (smallestX > 0) {
+    line(newXS, y0, x0, y0);
+  }
+  if (highestY < 0) {
+    line(x0, newYH, x0, y0, x0);
+  }
+  if (smallestY > 0) {
+    line(x0, newYS, x0, y0);
+  }
+  stroke(255, 255, 255);
+  line(newXS, y0, newXH, y0);
+  line(x0, newYS, x0, newYH);
 
+  // Angaben-Striche
+  stroke(254, 44, 84);
+  let lineSize = a * 0.1;
+  let lineY = step;
+  let newStep = a * step;
+  while (lineY < highestY) { // positive y
+    stroke(254, 44, 84);
+    let newLineY = -a * lineY + offsetY + a / (1 + offsetY / 1000);
+    line(x0 - lineSize / 2, newLineY, x0 + lineSize / 2, newLineY);
+    stroke(255, 255, 255);
+    for (let i = 1; i < 5; ++i) { // kleinere Linien zeichen zwischen Abschnitte
+      let change = newLineY + newStep / 5 * i;
+      line(x0 - lineSize / 3, change, x0 + lineSize / 3, change);
+    }
+    lineY += step;
+  }
+  lineY = step;
+  while (lineY > smallestY) { // positive y
+    stroke(254, 44, 84);
+    let newLineY = -a * lineY + offsetY + a / (1 + offsetY / 1000);
+    line(x0 - lineSize / 2, newLineY, x0 + lineSize / 2, newLineY);
+    stroke(255, 255, 255);
+    for (let i = 1; i < 5; ++i) { // kleinere Linien zeichen zwischen Abschnitte
+      let change = newLineY - newStep / 5 * i;
+      line(x0 - lineSize / 3, change, x0 + lineSize / 3, change);
+    }
+    lineY -= step;
+  }
+  let lineX = step;
+  while (lineX < highestX) {
+    stroke(254, 44, 84);
+    let newLineX = a * lineX + offsetX;
+    line(newLineX, y0 + lineSize / 2, newLineX, y0 - lineSize / 2);
+    stroke(255, 255, 255);
+    for (let i = 1; i < 5; ++i) {
+      let change = newLineX - newStep / 5 * i;
+      line(change, y0 + lineSize / 2, change, y0 - lineSize / 2);
+    }
+    lineX += step;
+  }
+  lineX = -step;
+  while (lineX > smallestX) {
+    stroke(254, 44, 84);
+    let newLineX = a * lineX + offsetX;
+    line(newLineX, y0 + lineSize / 2, newLineX, y0 - lineSize / 2);
+    stroke(255, 255, 255);
+    for (let i = 1; i < 5; ++i) {
+      let change = newLineX + newStep / 5 * i;
+      line(change, y0 + lineSize / 2, change, y0 - lineSize / 2);
+    }
+    lineX -= step;
+  }
+  noStroke();
+}
 
 let fromPToQ = 0.6;
 function getCoordsInRelation(collection1, collection2, relation, fixed) {

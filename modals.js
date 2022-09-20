@@ -125,24 +125,45 @@ function showCSVEditModal() {
 let createButtonCsvEdit = document.getElementById("btn_createNewGraph");
 let csvEditContinueBtn = document.getElementById("btn_csvEditContinue");
 
+let xSelection = [];
+let ySelection = [];
+let editCsvMode;
+let test = ["splitting via ';'", "splitting via ','","splitting via ';'", "splitting via ','","splitting via ';'", "splitting via ','","splitting via ';'", "splitting via ','"];
+let csvEditListGroup = [];
+for (let i = 0; i < test.length; ++i) {
+    csvEditListGroup.push(new BootstrapList("csvEditListGroup", null, test[i], i));
+    csvEditListGroup[i].create(csvEditListGroup);
+    csvEditListGroup[i].activate();
+}
+
 createButtonCsvEdit.addEventListener("click", () => {
     csvEditContinueBtn = document.getElementById("btn_csvEditContinue"); // wegen replace
     if (!(createButtonCsvEdit.innerHTML === "Cancle")) {
         createButtonCsvEdit.innerHTML = "Cancle";
         let graphName = prompt("Please add a graph name for simplicity");
-        while (graphNames.includes(graphName)) {
-            alert("name already exists, please choose a different one");
+        while (graphNames.includes(graphName) || graphName.length > 10) {
+            alert("Please choose a different graph-name");
             graphName = prompt("Please add a graph name for simplicity");
         }
         if (graphName !== null) {
             csvTable.classList.remove("table-striped");
             alert("Now choose x - coordinates from one column for your graph, " + graphName + ", by clicking table cells");
+            editCsvMode = "x";
             csvTableAddListeners("mainTable", CSVArray);
             csvEditContinueBtn.style.display = "block";
             csvEditContinueBtn.addEventListener("click", continueClicked);
             function continueClicked() {
-                if (checkNumbers(getTableResultFromArray("mainTable", CSVArray))) {
-                    alert("Now select y-values for your graph, " + graphName);
+                let arr = getTableResultFromArray("mainTable", CSVArray)
+                if (checkNumbers(arr)) {
+                    if (editCsvMode === "x") {
+                        alert("Now select y-values for your graph, " + graphName);
+                        editCsvMode = "y";
+                        xSelection = arr;
+                    } else {
+                        alert("Graph, " + graphName + ", successfully made! Feel free to add a main emphasis curve or delete this graph again");
+                        ySelection = arr;
+                        cancle();
+                    }
                 } else {
                     alert("Please only select numbers type float");
                 }
@@ -163,8 +184,11 @@ createButtonCsvEdit.addEventListener("click", () => {
         csvEditContinueBtn.style.display = "none";
         //csvEditContinueBtn.removeEventListener("click", continueClicked); --> copy damit funktioniert
         let elClone = csvEditContinueBtn.cloneNode(true);
+        try {
+            csvEditContinueBtn.parentNode.replaceChild(elClone, csvEditContinueBtn);
+        } catch (e) {
 
-        csvEditContinueBtn.parentNode.replaceChild(elClone, csvEditContinueBtn);
+        }
         csvTableAddListeners("mainTable", CSVArray, true)
     }
     mainModal.addEventListener('hidden.bs.modal', detectModalClose);
@@ -177,12 +201,12 @@ function checkNumbers(array) {
     if (array.length > 0) {
         for (let i = 0; i < array.length; ++i) {
             let item = array[i];
-            item = item.replaceAll(",",".");
+            item = item.replaceAll(",", ".");
             let num = parseFloat(item);
             if (isNaN(num)) {
                 return false;
             } else {
-                console.log("accepted: "+num);
+                console.log("accepted: " + num);
             }
         }
         return true;
@@ -269,7 +293,7 @@ csvTableDiv.addEventListener("mousemove", async (event) => { // scroll - Modus h
 
 function csvTableAddListeners(key, array, remove) { // key vom Erstellen des Tables benötigt, + array mit dem gearbeitet wurde
     let currentRow = 0;
-    if (remove) { // wahrscheinlich nicht umbedingt benötigt --> listener werden eh durch ersetzten der Elemente gelöscht
+    if (remove) {
         let longestElm = 0;
         array.forEach((elm) => { // einaml durchlaufen um längstes array herauszufinden
             if (elm.length > longestElm) {
