@@ -17,7 +17,7 @@ inputRange.addEventListener('input', (event) => {
 
 document.addEventListener('wheel', (event) => { // mouse scroll für resizing detecten in canvas von p5js
   if (window.getComputedStyle(mainModal).display === "none") {
-    zoomFactor -= event.deltaY / 70;
+    zoomFactor -= event.deltaY / 60;
     loadWithDefaults();
   }
 });
@@ -77,7 +77,15 @@ async function handleFiles(event) { // auf file input hören
   }
   uploadInput.value = null;
 }
-
+let showAxes = true;
+document.addEventListener("keypress", function (event) {
+  if (window.getComputedStyle(mainModal).display === "none") {
+    if (event.key === "a") {
+      showAxes = !showAxes;
+      loadWithDefaults();
+    }
+  }
+});
 function readCSV(file) {
   return new Promise(resolve => { // Promise, da reader.onload async abläuft
     // Überprüfen ob typ csv
@@ -145,8 +153,9 @@ function presetCoordinates() {
 function setup() {
   loadWithDefaults();
 }
+
 function loadWithDefaults() { // damit man nicht immer dasselbe schreiben muss, man hätte auch direkt als global vars schreiben können, dann könnte man aber im Falle der Fälle nicht einfach beliebige Werte einsetzen /// leichter wiederverwendbar
-  load(coordinates, zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow);
+  load(coordinates, zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow, showAxes);
 }
 
 let xOffset = 60;
@@ -154,10 +163,44 @@ let yOffset = 350;
 
 
 
-function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines) {
+function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines, showAxes) {
+ //yOffset = yOffset+ a / (1 + yOffset / 1000)
+ yOffset = yOffset - (-a * 0 + yOffset) + 424; // um den Ursprung ohne Bewegung zu behalten bei Zoom // statisch
   //background(19, 19, 18);
   createCanvas(windowWidth, windowHeight); // vllt ineffektiver / langsamer --> passt sich aber jedes mal auf die Screenweite an ...
   let data = cords; // habe vorher direkt hier presetCords erfragt und als data gespeichert --> deswegen Übertragung
+
+  if (showAxes) {
+    let smallestX; // niedrigste und höchste Werte herausfinden, und Achsen zeichen --> ganz hinten, deswegen hier am Anfang
+    let highestX;
+    let smallestY;
+    let highestY;
+    for (let graphKey in data) { // höchste, niedrigste xy koords bestimmen --> ginge auch über concat ...
+      let graph = data[graphKey];
+      let smallestXF = Math.min(...graph.x);
+      let highestXF = Math.max(...graph.x);
+      let smallestYF = Math.min(...graph.y);
+      let highestYF = Math.max(...graph.y);
+      if (smallestX === undefined || smallestXF < smallestX) {
+        smallestX = smallestXF;
+      }
+      if (highestX === undefined || highestXF > highestX) {
+        highestX = highestXF;
+      }
+      if (smallestY === undefined || smallestYF < smallestY) {
+        smallestY = smallestYF;
+      }
+      if (highestY === undefined || highestYF > highestY) {
+        highestY = highestYF;
+      }
+    }
+
+    drawAxes(smallestX, highestX, smallestY, highestY, a, xOffset, yOffset, 0.5); // vorher Achsen zeichnen
+  }
+
+
+
+
   let mainEmphasisCoords;
   for (let graphKey in data) { // zweifache for Schleife des selbigen Typs, da erst im Falle die Schwerpunktbahn-Kurve gezeichnet wird, damit diese in den Hintergrund rutscht, egal welches Object welchen Partner angegeben hat
     let graph = data[graphKey];
@@ -175,31 +218,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines)
       emphasisPartner = undefined;
     }
   }
-  let smallestX;
-  let highestX;
-  let smallestY;
-  let highestY;
-  for (let graphKey in data) { // höchste, niedrigste xy koords bestimmen --> ginge auch über concat ...
-    let graph = data[graphKey];
-    let smallestXF = Math.min(...graph.x);
-    let highestXF = Math.max(...graph.x);
-    let smallestYF = Math.min(...graph.y);
-    let highestYF = Math.max(...graph.y);
-    if (smallestX === undefined || smallestXF < smallestX) {
-      smallestX = smallestXF;
-    }
-    if (highestX === undefined || highestXF > highestX) {
-      highestX = highestXF;
-    }
-    if (smallestY === undefined || smallestYF < smallestY) {
-      smallestY = smallestYF;
-    }
-    if (highestY === undefined || highestYF > highestY) {
-      highestY = highestYF;
-    }
-  }
-  //alert(smallestX + " " + highestX + " " + smallestY + " " + highestY);
-  drawAxes(smallestX, highestX, smallestY, highestY, a, xOffset, yOffset, 0.5); // vorher Achsen zeichnen
+
   for (let graphKey in data) { // key entspricht 1 Object mit x für x-Kords und y für y-Kords
     let graph = data[graphKey];
     let emphasisPartner;
@@ -229,13 +248,13 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines)
 
 function drawAxes(smallestX, highestX, smallestY, highestY, a, offsetX, offsetY, step) {
   let newXS = a * smallestX + offsetX; // offset etc anwenden
-  let newYS = -a * smallestY + offsetY + a / (1 + offsetY / 1000); // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
+  let newYS = -a * smallestY + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
   let newXH = a * highestX + offsetX; // offset etc anwenden
-  let newYH = -a * highestY + offsetY + a / (1 + offsetY / 1000); // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
-  let y0 = offsetY + a / (1 + offsetY / 1000);
+  let newYH = -a * highestY + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
+  let y0 = offsetY;
   let x0 = offsetX;
   // endende Axenbereiche wenn nötig erweitern
-  stroke(100,149,237);
+  stroke(100, 149, 237);
   if (highestX < 0) {
     line(newXH, y0, x0, y0);
   }
@@ -259,7 +278,7 @@ function drawAxes(smallestX, highestX, smallestY, highestY, a, offsetX, offsetY,
   let newStep = a * step;
   while (lineY < highestY) { // positive y
     stroke(254, 44, 84);
-    let newLineY = -a * lineY + offsetY + a / (1 + offsetY / 1000);
+    let newLineY = -a * lineY + offsetY;
     line(x0 - lineSize / 2, newLineY, x0 + lineSize / 2, newLineY);
     stroke(255, 255, 255);
     for (let i = 1; i < 5; ++i) { // kleinere Linien zeichen zwischen Abschnitte
@@ -271,7 +290,7 @@ function drawAxes(smallestX, highestX, smallestY, highestY, a, offsetX, offsetY,
   lineY = step;
   while (lineY > smallestY) { // positive y
     stroke(254, 44, 84);
-    let newLineY = -a * lineY + offsetY + a / (1 + offsetY / 1000);
+    let newLineY = -a * lineY + offsetY;
     line(x0 - lineSize / 2, newLineY, x0 + lineSize / 2, newLineY);
     stroke(255, 255, 255);
     for (let i = 1; i < 5; ++i) { // kleinere Linien zeichen zwischen Abschnitte
@@ -352,7 +371,7 @@ function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
   let lastY;
   for (let i = 0; i < x.length; ++i) {
     let newX = a * x[i] + offsetX; // offset etc anwenden
-    let newY = -a * y[i] + offsetY + a / (1 + offsetY / 1000); // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
+    let newY = -a * y[i] + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
     if (i != 0) {
       // Strecken einzeichnen
       // alle Strecken einzeichnen, nach i == 0
@@ -370,7 +389,7 @@ function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
         let oA = othersCords[o][2][0]; // erst schön übersichtlich Daten aus Array übertragen
         let oX = othersCords[o][2][1];
         let oY = othersCords[o][2][2];
-        line(newX, newY, oA * othersCords[o][0][i] + oX, -oA * othersCords[o][1][i] + oY + oA / (1 + (oY / 1000)));
+        line(newX, newY, oA * othersCords[o][0][i] + oX, -oA * othersCords[o][1][i] + oY);
         noStroke();
       }
     }
