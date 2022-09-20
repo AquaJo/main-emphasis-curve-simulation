@@ -159,13 +159,13 @@ function loadWithDefaults() { // damit man nicht immer dasselbe schreiben muss, 
 }
 
 let xOffset = 60;
-let yOffset = 350;
+let yOffset = 424;
 
 
 
 function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines, showAxes) {
- //yOffset = yOffset+ a / (1 + yOffset / 1000)
- yOffset = yOffset - (-a * 0 + yOffset) + 424; // um den Ursprung ohne Bewegung zu behalten bei Zoom // statisch
+  //yOffset = yOffset+ a / (1 + yOffset / 1000)
+
   //background(19, 19, 18);
   createCanvas(windowWidth, windowHeight); // vllt ineffektiver / langsamer --> passt sich aber jedes mal auf die Screenweite an ...
   let data = cords; // habe vorher direkt hier presetCords erfragt und als data gespeichert --> deswegen Übertragung
