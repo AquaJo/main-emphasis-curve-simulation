@@ -221,15 +221,54 @@ canvas {
 }
 
 
+
 #csvEditListGroup {
   max-height: 210px;
   overflow: auto;
-  margin-top: -25px;
+  margin-top: -75px;
 }
 
 #csvEditListGroup a {
   background-color: rgb(33, 37, 41);
   border-color: rgb(33, 37, 41);
+}
+
+
+
+
+#createEmphasisCurve {
+  position:absolute;
+  z-index:4;
+  margin-left:650px;
+  margin-top:-28px;
+  font-size: 24px;
+  color: white;
+  cursor: pointer
+}
+
+#createEmphasisCurve:before {
+  content: '\ea3b';
+}
+
+#createEmphasisCurve:hover {
+  color: #2497E3 !important;
+}
+
+#trashBin {
+  position:absolute;
+  z-index:4;
+  margin-left:690px;
+  margin-top:-28px;
+  font-size: 24px;
+  color: white;
+  cursor: pointer
+}
+#trashBin:before {
+  content: '\e872';
+}
+
+#trashBin:hover {
+  color: #2497E3 !important;
 }
 
 

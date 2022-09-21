@@ -147,6 +147,7 @@ function presetCoordinates() {
     "color": [255, 127, 80],
     "shape": "RECT"
   }
+  //console.log(data);
   return data;
 }
 
@@ -369,7 +370,8 @@ function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
   fill(color[0], color[1], color[2]);
   let lastX;
   let lastY;
-  for (let i = 0; i < x.length; ++i) {
+  let longest = x.length > y.length ? x.length : y.length;
+  for (let i = 0; i < longest; ++i) {
     let newX = a * x[i] + offsetX; // offset etc anwenden
     let newY = -a * y[i] + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
     if (i != 0) {

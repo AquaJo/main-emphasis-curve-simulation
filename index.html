@@ -41,7 +41,7 @@
           <div id="mainModalSplitMode" class="displayNone">
             <div id="listExampleWrapper" class="displayNone">
               <a id="list_addRom_AExample" class="list-group-item list-group-item-action active selection hiddenOwn"
-                data-toggle="list" href="#list-home" role="tab" aria-controls="home">Home</a>
+                data-toggle="list" href="#list-home" role="tab" aria-controls="home"></a>
             </div>
             <div class="list-group" id="listGroupSplitMode" role="tablist">
             </div>
@@ -81,7 +81,9 @@
               </table>
             </div>
             <button id="btn_createNewGraph" type="button" class="btn btn-primary">Create new Graph</button>
-            <button id="btn_csvEditContinue"  type="button" class="btn btn-primary displayNone">Continue</button>
+            <button id="btn_csvEditContinue" type="button" class="btn btn-primary displayNone">Continue</button>
+            <div class="chromeMaterial displayNone" id="createEmphasisCurve" title = "create / overwrite main emphasis curve with partner graph"></div>
+            <div class="chromeMaterial displayNone" id="trashBin" title = "delete this graph"></div>
             <div class="list-group" id="csvEditListGroup" role="tablist">
             </div>
             <!--
@@ -128,10 +130,10 @@
       </div>
     </div>
 
-    <p class="footer first P" class="zoomFactor">P - Cords</p>
-    <p class="footer first Q" class="zoomFactor">Q - Cords</p>
+    <p id = "PCORDS" class="footer first P" class="zoomFactor">P - Cords</p>
+    <p id = "QCORDS" class="footer first Q" class="zoomFactor">Q - Cords</p>
     <p class="footer second emphasis" class="zoomFactor">supposed main emphasis curve ('S')</p>
-    <p class="footer third white" class="zoomFactor">PQ - connection lines</p>
+    <p id = "CONNECTIONLINES" class="footer third white" class="zoomFactor">PQ - connection lines</p>
     <p class="footer fourth step" class="zoomFactor">step = .5 (currently not changable)</p>
 
   </main>

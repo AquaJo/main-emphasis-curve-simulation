@@ -24,6 +24,10 @@ function detectModalClose() {
         csvTable.classList.add("table-striped");
     }
     csvEditContinueBtn.style.display = "none";
+
+    csvEditListGroup.forEach((elm) => {
+        elm.delete();
+    })
 }
 document.getElementById("editInput").addEventListener("click", () => { // für den input-range - Modal-Dialog
     mainModalTitle.innerHTML = "set input range";
@@ -116,10 +120,61 @@ function showCSVEditModal() {
     arrayToBootstrapTable(CSVArray, document.getElementById("CSVTable"), "mainTable");
     $('#mainModal').modal('show');
     mainModal.addEventListener('hidden.bs.modal', detectModalClose);
+    mainModalFooterBtn2.addEventListener("click", createClick);
+    //coordinates, zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow, showAxes
+    function createClick() {
+        if (graphNames.length > 0) {
+            let objRes = {};
+            let counter = 0;
+            for (let element of csvEditListGroup) {
+                counter++;
+                let obj = element.returnCsvEditModeGraph();
+                // auf dieses Format bringen
+                let color = obj.color;
+                let shape = obj.shape;
+                let numberString = counter.toString();
+                objRes[numberString] = {};
+                objRes[numberString].x = obj.x;
+                objRes[numberString].y = obj.y;
+                objRes[numberString].config = {
+                    "color": color,
+                    "shape": shape,
+                    /*"emphasis": {
+                      "partner": "2"
+                    }*/
+                }
+                if (obj.emphasisPartner !== undefined) {
+                    let emphasisObj = objRes[numberString].config.emphasis = {};
+                    emphasisObj.partner = obj.emphasisPartner;
+                }
+                /*objRes = {
+                    // template
+                    "1": {
+                        x: [],
+                        y: []
+                    },
+                    "2": {
+                        x: [],
+                        y: []
+                    }
+                };*/
+
+
+            }
+            console.log(objRes);
+            coordinates = objRes;
+            loadWithDefaults();
+        }
+        document.getElementById("PCORDS").style.display = "none";
+        document.getElementById("QCORDS").style.display = "none";
+        document.getElementById("CONNECTIONLINES").innerHTML = "connection lines";
+    }
     function detectModalClose() {
+        mainModalFooterBtn2.removeEventListener("click", createClick);
         mainModal.removeEventListener('hidden.bs.modal', detectModalClose);
         csvTableAddListeners("mainTable", CSVArray, true);
     }
+
 }
 
 let createButtonCsvEdit = document.getElementById("btn_createNewGraph");
@@ -128,24 +183,50 @@ let csvEditContinueBtn = document.getElementById("btn_csvEditContinue");
 let xSelection = [];
 let ySelection = [];
 let editCsvMode;
-let test = ["splitting via ';'", "splitting via ','","splitting via ';'", "splitting via ','","splitting via ';'", "splitting via ','","splitting via ';'", "splitting via ','"];
+
 let csvEditListGroup = [];
-for (let i = 0; i < test.length; ++i) {
-    csvEditListGroup.push(new BootstrapList("csvEditListGroup", null, test[i], i));
-    csvEditListGroup[i].create(csvEditListGroup);
-    csvEditListGroup[i].activate();
-}
 
 createButtonCsvEdit.addEventListener("click", () => {
     csvEditContinueBtn = document.getElementById("btn_csvEditContinue"); // wegen replace
     if (!(createButtonCsvEdit.innerHTML === "Cancle")) {
         createButtonCsvEdit.innerHTML = "Cancle";
         let graphName = prompt("Please add a graph name for simplicity");
-        while (graphNames.includes(graphName) || graphName.length > 10) {
+        while (graphName !== null && (graphNames.includes(graphName) || graphName.length > 30)) {
             alert("Please choose a different graph-name");
             graphName = prompt("Please add a graph name for simplicity");
         }
+        let graphColor = null;
+        let graphColors;
+        let shape = null;
         if (graphName !== null) {
+            graphColor = prompt("Please set rgb color for graph (like this: '50,205,50', so (0<=int<=255, 0<=int<=255, 0<=int<=255))");
+            if (graphColor !== null) {
+                graphColors = graphColor.split(",");
+                while (graphColors.length != 3 || !Number.isInteger(parseInt(graphColors[0])) || !Number.isInteger(parseInt(graphColors[1])) || !Number.isInteger(parseInt(graphColors[2])) || parseInt(graphColors[0]) > 255 || parseInt(graphColors[0]) < 0 || parseInt(graphColors[1]) > 255 || parseInt(graphColors[1]) < 0 || parseInt(graphColors[2]) > 255 || parseInt(graphColors[2]) < 0) { // hätte auch vorher parseInt machen können ...
+                    alert("Please follow the syntax");
+                    graphColor = prompt("Please set rgb color for graph (like this: '50,205,50', so (0<=int<=255, 0<=int<=255, 0<=int<=255))");
+                    if (graphColor !== null) {
+                        graphColors = graphColor.split(",");
+                    } else {
+                        break;
+                    }
+                }
+                if (graphColor !== null) {
+                    shape = prompt("Please choose a marking shape choose between 'circle' and 'rectangle'");
+                    if (shape !== null) {
+                        while (shape !== "rectangle" && shape !== "circle") {
+                            if (shape !== null) {
+                                alert("Please type the exact letters");
+                                shape = prompt("Please choose a marking shape choose between 'circle' and 'rectangle'");
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (graphName !== null && graphColor !== null && shape !== null) {
             csvTable.classList.remove("table-striped");
             alert("Now choose x - coordinates from one column for your graph, " + graphName + ", by clicking table cells");
             editCsvMode = "x";
@@ -162,6 +243,13 @@ createButtonCsvEdit.addEventListener("click", () => {
                     } else {
                         alert("Graph, " + graphName + ", successfully made! Feel free to add a main emphasis curve or delete this graph again");
                         ySelection = arr;
+                        // Listen-Element hinzufügen
+                        graphNames.push(graphName);
+                        let index = csvEditListGroup.length;
+                        csvEditListGroup.push(new BootstrapList("csvEditListGroup", null, graphName, index));
+                        csvEditListGroup[index].create(csvEditListGroup);
+                        csvEditListGroup[index].activate();
+                        csvEditListGroup[index].csvEditMode(xSelection, ySelection, [parseInt(graphColors[0]), parseInt(graphColors[1]), parseInt(graphColors[2])], shape, graphName);
                         cancle();
                     }
                 } else {
