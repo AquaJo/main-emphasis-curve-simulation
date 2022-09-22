@@ -24,10 +24,6 @@ function detectModalClose() {
         csvTable.classList.add("table-striped");
     }
     csvEditContinueBtn.style.display = "none";
-
-    csvEditListGroup.forEach((elm) => {
-        elm.delete();
-    })
 }
 document.getElementById("editInput").addEventListener("click", () => { // für den input-range - Modal-Dialog
     mainModalTitle.innerHTML = "set input range";
@@ -110,7 +106,6 @@ let CSVArray;
 
 let graphNames = [];
 function showCSVEditModal() {
-    graphNames = [];
     mainModalTitle.innerHTML = "set graphs from csv";
     mainModalCSVEdit.style.display = "block";
     mainModalText.style.height = (screen.availHeight * 0.7).toString() + "px";
@@ -133,10 +128,10 @@ function showCSVEditModal() {
                 let color = obj.color;
                 let shape = obj.shape;
                 let numberString = counter.toString();
-                objRes[numberString] = {};
-                objRes[numberString].x = obj.x;
-                objRes[numberString].y = obj.y;
-                objRes[numberString].config = {
+                objRes[obj.uniqueNum] = {};
+                objRes[obj.uniqueNum].x = obj.x;
+                objRes[obj.uniqueNum].y = obj.y;
+                objRes[obj.uniqueNum].config = {
                     "color": color,
                     "shape": shape,
                     /*"emphasis": {
@@ -144,7 +139,7 @@ function showCSVEditModal() {
                     }*/
                 }
                 if (obj.emphasisPartner !== undefined) {
-                    let emphasisObj = objRes[numberString].config.emphasis = {};
+                    let emphasisObj = objRes[obj.uniqueNum].config.emphasis = {};
                     emphasisObj.partner = obj.emphasisPartner;
                 }
                 /*objRes = {

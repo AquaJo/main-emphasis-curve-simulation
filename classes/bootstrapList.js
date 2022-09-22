@@ -1,4 +1,6 @@
 
+let maxNumGraphs = 0;
+let graphNamesAndNum = [];
 class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht modifiziert 
     constructor(_listID, _key, _title, _index) {
         this.mainList = document.getElementById(_listID);
@@ -98,6 +100,7 @@ class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht 
     }
     returnCsvEditModeGraph() {
         let obj = {};
+        obj.uniqueNum = this.csvEditMyNum;
         obj.color = this.csvEditColor;
         obj.x = this.csvEditX;
         obj.y = this.csvEditY;
@@ -116,21 +119,30 @@ class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht 
     }
     csvEditModeRefreshPartnerNum() { // aufgerufen von anderen Instanzen bei Löschung
         if (this.csvEditPartnerNum !== null) {
-            if (graphNames.includes(otherName)) {
-                for (let i = 0; i < csvEditListGroup.length; ++i) { // vielleicht nicht der schönste Weg innerhalb einer Klasse ...
-                    if (csvEditListGroup[i].returnCsvEditModeGraphName === otherName) {
-                        this.csvEditPartnerNum = i + 1; // da ab 1 anfängt (obj für coordinates)
-                        this.csvEditPartnerName = otherName;
+            if (graphNames.includes(this.csvEditPartnerName)) {
+                for (let i = 0; i < graphNamesAndNum.length; ++i) {
+                    if (graphNamesAndNum[i][0] === this.csvEditPartnerName) {
+                        this.csvEditPartnerNum = graphNamesAndNum[i][1];
                     }
                 }
             } else {
+                for (let i = 0; i < graphNamesAndNum.length; ++i) {
+                    if (graphNamesAndNum[i][0] === this.csvEditPartnerName) {
+                        graphNamesAndNum.splice(i, 1);
+                    }
+                }
                 this.csvEditPartnerNum = null;
                 this.csvEditPartnerName = undefined;
             }
         }
     }
     csvEditMode(x, y, color, shape, graphName) {
+        maxNumGraphs++;
+        this.csvEditMyNum = maxNumGraphs;
+        graphNamesAndNum.push([graphName, maxNumGraphs]);
+
         this.csvEditGraphName = graphName;
+
         let xNew = [];
         for (let i = 0; i < x.length; ++i) { // x und y von String array zu float Array
             x[i] = x[i].replaceAll(",", ".");
@@ -154,23 +166,33 @@ class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht 
         trashbinClone.style.display = "block";
         let self = this;
         trashbinClone.addEventListener("click", () => {
-            graphNames.splice(graphNames.indexOf(self.title), 1);
-            for (let i = 0; i < csvEditListGroup.length; ++i) {
-                this.csvEditListGroup[i].csvEditModeRefreshPartnerNum();
+            if (confirm('Do you really want to delete this graph? Cant be canceled via cancel')) {
+                let index = graphNames.indexOf(self.title);
+                graphNames.splice(index, 1);
+                csvEditListGroup.splice(index, 1);
+                console.log(csvEditListGroup);
+                for (let i = 0; i < csvEditListGroup.length; ++i) {
+                    csvEditListGroup[i].csvEditModeRefreshPartnerNum();
+                }
+                console.log(self.csvEditMyNum);
+                delete coordinates[(self.csvEditMyNum).toString()];
+                loadWithDefaults();
+                self.delete();
+            } else {
+                // mach nichts
             }
-            self.delete();
         })
         createEmphasisCurveClone.addEventListener("click", () => {
-            let otherName = prompt("Please type the graphs partner name here (must be declared in this dialog, else feel free to reload and rebuild ... (maybe gets improved in the future))");
+            let otherName = prompt("Please type the graphs partner name here");
             if (prompt !== null) {
                 while (!graphNames.includes(otherName) && otherName !== null) {
                     alert("Please type the right name");
-                    otherName = prompt("Please type the graphs partner name here (must be declared in this dialog, else feel free to reload and rebuild ... (maybe gets improved in the future))");
+                    otherName = prompt("Please type the graphs partner name here");
                 }
                 if (otherName !== null) {
-                    for (let i = 0; i < csvEditListGroup.length; ++i) { // vielleicht nicht der schönste Weg innerhalb einer Klasse ...
-                        if (csvEditListGroup[i].returnCsvEditModeGraphName() === otherName) {
-                            self.csvEditPartnerNum = i + 1; // da ab 1 anfängt (obj für coordinates)
+                    for (let i = 0; i < graphNamesAndNum.length; ++i) {
+                        if (graphNamesAndNum[i][0] === otherName) {
+                            self.csvEditPartnerNum = graphNamesAndNum[i][1];
                             self.csvEditPartnerName = otherName;
                             console.log("set partner");
                         }
