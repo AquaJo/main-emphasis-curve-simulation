@@ -5,4 +5,4 @@ Its documentation is on german, .. its made as a school project in physics class
 key - commands:
 hide axes -> type a
 
-Website-Link: https://aquajo.github.io/physics-olympiad-no3/
+Website-Link: https://aquajo.github.io/main-emphasis-curve-simulation/
