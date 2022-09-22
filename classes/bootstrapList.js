@@ -1,6 +1,7 @@
 
 let maxNumGraphs = 0;
 let graphNamesAndNum = [];
+let tempGraphs = [];
 class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht modifiziert 
     constructor(_listID, _key, _title, _index) {
         this.mainList = document.getElementById(_listID);
@@ -136,7 +137,22 @@ class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht 
             }
         }
     }
+    csvEditModeDelete() {
+        let self = this;
+        let index = graphNames.indexOf(self.title);
+        graphNames.splice(index, 1);
+        csvEditListGroup.splice(index, 1);
+        console.log(csvEditListGroup);
+        for (let i = 0; i < csvEditListGroup.length; ++i) {
+            csvEditListGroup[i].csvEditModeRefreshPartnerNum();
+        }
+        console.log(self.csvEditMyNum);
+        delete coordinates[(self.csvEditMyNum).toString()];
+        loadWithDefaults();
+        self.delete();
+    }
     csvEditMode(x, y, color, shape, graphName) {
+        tempGraphs.push(graphName);
         maxNumGraphs++;
         this.csvEditMyNum = maxNumGraphs;
         graphNamesAndNum.push([graphName, maxNumGraphs]);
@@ -167,17 +183,7 @@ class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht 
         let self = this;
         trashbinClone.addEventListener("click", () => {
             if (confirm('Do you really want to delete this graph? Cant be canceled via cancel')) {
-                let index = graphNames.indexOf(self.title);
-                graphNames.splice(index, 1);
-                csvEditListGroup.splice(index, 1);
-                console.log(csvEditListGroup);
-                for (let i = 0; i < csvEditListGroup.length; ++i) {
-                    csvEditListGroup[i].csvEditModeRefreshPartnerNum();
-                }
-                console.log(self.csvEditMyNum);
-                delete coordinates[(self.csvEditMyNum).toString()];
-                loadWithDefaults();
-                self.delete();
+                self.csvEditModeDelete();
             } else {
                 // mach nichts
             }

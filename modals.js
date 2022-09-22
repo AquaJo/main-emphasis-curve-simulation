@@ -24,6 +24,14 @@ function detectModalClose() {
         csvTable.classList.add("table-striped");
     }
     csvEditContinueBtn.style.display = "none";
+    for (let i = 0; i < tempGraphs.length; ++i) {
+        for (let j = 0; j < csvEditListGroup.length; ++j) {
+            if (csvEditListGroup[j].returnCsvEditModeGraphName() === tempGraphs[i]) {
+                csvEditListGroup[j].csvEditModeDelete();
+                break;
+            }
+        }
+    }
 }
 document.getElementById("editInput").addEventListener("click", () => { // für den input-range - Modal-Dialog
     mainModalTitle.innerHTML = "set input range";
@@ -118,6 +126,7 @@ function showCSVEditModal() {
     mainModalFooterBtn2.addEventListener("click", createClick);
     //coordinates, zoomFactor, xOffset, yOffset, inputRange.value, showWhiteNow, showAxes
     function createClick() {
+        tempGraphs = [];
         if (graphNames.length > 0) {
             let objRes = {};
             let counter = 0;
