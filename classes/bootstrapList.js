@@ -1,5 +1,5 @@
 
-let maxNumGraphs = 0;
+let maxNumGraphs = 5; // start nicht bei 0 --> da 1,2 bereits besetzt
 let graphNamesAndNum = [];
 let tempGraphs = [];
 class BootstrapList { // Klasse von meinem anderen Project übernommen + leicht modifiziert 
