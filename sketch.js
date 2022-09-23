@@ -215,16 +215,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
       // bis hier gekommen -> Schwerpunkbahn-Kords benötigt ... // zweifacher draw in einer for - iteration
       mainEmphasisCoords = getCoordsInRelation(meCollection, partnerCollection, emphasisRelation, true);
       drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
-    } catch (e) {
-      emphasisPartner = undefined;
-    }
-  }
 
-  for (let graphKey in data) { // key entspricht 1 Object mit x für x-Kords und y für y-Kords
-    let graph = data[graphKey];
-    let emphasisPartner;
-    let partnerCollection;
-    try {
       emphasisPartner = graph.config.emphasis.partner;
       // bis hier gekommen -> Schwerpunkbahn-Kords bereits gezeichnet ...
       if (emphasisRelation >= -1 && emphasisRelation <= 1) { // wenn innerhalb der beiden Kurvenpunkte
@@ -240,10 +231,11 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
           partnerCollection = [partnerCollection];
         }
       }
+      drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
     } catch (e) {
       emphasisPartner = undefined;
+      drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
     }
-    drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
   }
 }
 
