@@ -214,9 +214,9 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
       partnerCollection = [data[emphasisPartner].x, data[emphasisPartner].y];
       // bis hier gekommen -> Schwerpunkbahn-Kords benötigt ... // zweifacher draw in einer for - iteration
       mainEmphasisCoords = getCoordsInRelation(meCollection, partnerCollection, emphasisRelation, true);
-      drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
 
       emphasisPartner = graph.config.emphasis.partner;
+
       // bis hier gekommen -> Schwerpunkbahn-Kords bereits gezeichnet ...
       if (emphasisRelation >= -1 && emphasisRelation <= 1) { // wenn innerhalb der beiden Kurvenpunkte
         partnerCollection = [[data[emphasisPartner].x, data[emphasisPartner].y, [a, xOffset, yOffset]]]; // auf die des Partners setzen mit Extra-Infos
@@ -231,11 +231,15 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
           partnerCollection = [partnerCollection];
         }
       }
-      drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
+
+      drawConnectionLines(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined); // einfach selbes Schema wie aus vorherige Methode --> drawCoords() genommen, --> schnelles copy-pasting, auch wenn bis jz nicht alle infos gebraucht
+      drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
+
+
     } catch (e) {
       emphasisPartner = undefined;
-      drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
     }
+    drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
   }
 }
 
@@ -356,6 +360,31 @@ function getCoordsInRelation(collection1, collection2, relation, fixed) {
   newCollection.push(allY);
   return newCollection;
 }
+function drawConnectionLines(x, y, a, offsetX, offsetY, shape, color, othersCords) {
+  let w = 6; // w === Weite
+  //let a = 100; // Streckung bestimmen
+  let longest = x.length > y.length ? x.length : y.length;
+
+  let oA; // erst schön übersichtlich Daten aus Array übertragen // einmalig diesmal in der neuen Funktion
+  let oX;
+  let oY;
+
+
+  if (othersCords) { // Verbindungslinien zwischen den unterschiedlichen Kurven entstehend aus P und Q Koordinaten
+    oA = othersCords[0][2][0]; // erst schön übersichtlich Daten aus Array übertragen
+    oX = othersCords[0][2][1];
+    oY = othersCords[0][2][2];
+  }
+  for (let i = 0; i < longest; ++i) {
+    let newX = a * x[i] + offsetX; // offset etc anwenden
+    let newY = -a * y[i] + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
+    if (othersCords) {
+      stroke(255, 255, 255);
+      line(newX, newY, oA * othersCords[0][0][i] + oX, -oA * othersCords[0][1][i] + oY);
+      noStroke();
+    }
+  }
+}
 function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
   let w = 6; // w === Weite
   //let a = 100; // Streckung bestimmen
@@ -375,7 +404,7 @@ function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
     }
     lastX = newX; // copy machen von neuen xy - koords um danach Strecken zeichnen zu können
     lastY = newY;
-
+    /* // Verbindungslinieneinzeichnung verschoben in seperate funktion --> othersCords nun hierbei unnötig als Parameter --> wahrscheinlich später, falls neue Parameter benötigt, mal Löschung des Params
     if (othersCords) { // Verbindungslinien zwischen den unterschiedlichen Kurven entstehend aus P und Q Koordinaten
       for (let o = 0; o < othersCords.length; ++o) { // alle Verbindungsgraphen durchgehen // vllt. später noch Farboptionen hinzufügen
         // muss am Anfang stehen, damit es in den Hintergrund rückt
@@ -387,7 +416,7 @@ function drawCoords(x, y, a, offsetX, offsetY, shape, color, othersCords) {
         noStroke();
       }
     }
-
+    */
     if (shape === "CIRCLE") {
       // Punktungen einzeichnen
       ellipseMode(CENTER);
