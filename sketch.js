@@ -217,7 +217,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
 
       emphasisPartner = graph.config.emphasis.partner;
 
-      // bis hier gekommen -> Schwerpunkbahn-Kords bereits gezeichnet ...
+      // bis hier gekommen -> Schwerpunkbahn-Kords ... eingetragener Schwerpunktbahnpartner gefunden
       if (emphasisRelation >= -1 && emphasisRelation <= 1) { // wenn innerhalb der beiden Kurvenpunkte
         partnerCollection = [[data[emphasisPartner].x, data[emphasisPartner].y, [a, xOffset, yOffset]]]; // auf die des Partners setzen mit Extra-Infos
       } else {
@@ -364,24 +364,19 @@ function drawConnectionLines(x, y, a, offsetX, offsetY, shape, color, othersCord
   let w = 6; // w === Weite
   //let a = 100; // Streckung bestimmen
   let longest = x.length > y.length ? x.length : y.length;
-
-  let oA; // erst schön übersichtlich Daten aus Array übertragen // einmalig diesmal in der neuen Funktion
-  let oX;
-  let oY;
-
-
-  if (othersCords) { // Verbindungslinien zwischen den unterschiedlichen Kurven entstehend aus P und Q Koordinaten
-    oA = othersCords[0][2][0]; // erst schön übersichtlich Daten aus Array übertragen
-    oX = othersCords[0][2][1];
-    oY = othersCords[0][2][2];
-  }
   for (let i = 0; i < longest; ++i) {
     let newX = a * x[i] + offsetX; // offset etc anwenden
     let newY = -a * y[i] + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
-    if (othersCords) {
-      stroke(255, 255, 255);
-      line(newX, newY, oA * othersCords[0][0][i] + oX, -oA * othersCords[0][1][i] + oY);
-      noStroke();
+    if (othersCords) { // Verbindungslinien zwischen den unterschiedlichen Kurven entstehend aus P und Q Koordinaten
+      for (let o = 0; o < othersCords.length; ++o) { // alle Verbindungsgraphen durchgehen // vllt. später noch Farboptionen hinzufügen
+        // muss am Anfang stehen, damit es in den Hintergrund rückt
+        stroke(255, 255, 255);
+        let oA = othersCords[o][2][0]; // erst schön übersichtlich Daten aus Array übertragen
+        let oX = othersCords[o][2][1];
+        let oY = othersCords[o][2][2];
+        line(newX, newY, oA * othersCords[o][0][i] + oX, -oA * othersCords[o][1][i] + oY);
+        noStroke();
+      }
     }
   }
 }
