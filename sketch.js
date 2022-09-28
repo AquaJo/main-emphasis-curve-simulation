@@ -240,7 +240,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
     } catch (e) {
       emphasisPartner = undefined;
     }
-    drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
+    drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined); // letzter Parameter hier eigentlich immer undefined --> vorherige andere Programmstruktur
   }
 }
 
