@@ -195,9 +195,14 @@ createButtonCsvEdit.addEventListener("click", () => {
     if (!(createButtonCsvEdit.innerHTML === "Cancle")) {
         createButtonCsvEdit.innerHTML = "Cancle";
         let graphName = prompt("Please add a graph name for simplicity");
-        while (graphName !== null && (graphNames.includes(graphName) || graphName.length > 30)) {
-            alert("Please choose a different graph-name");
-            graphName = prompt("Please add a graph name for simplicity");
+        if (graphName !== null) {
+            while (graphName === "" || graphName === undefined || graphName.length === 0 || graphNames.includes(graphName) || graphName.length > 30) {
+                alert("Please choose a different graph-name");
+                graphName = prompt("Please add a graph name for simplicity");
+                if (graphName === null) {
+                    break; // length not working/ returns error when result === null
+                }
+            }
         }
         let graphColor = null;
         let graphColors;
