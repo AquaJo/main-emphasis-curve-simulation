@@ -151,6 +151,25 @@ function presetCoordinates() {
   return data;
 }
 
+function sortObjectByPartnersFirst(data) {
+  let keysInRightOrder = [];
+  let firstKeys = [];
+  let lastKeys = [];
+  for (let graphKey in data) { // höchste, niedrigste xy koords bestimmen --> ginge auch über concat ...
+    let graph = data[graphKey];
+    try {
+      graph.config.emphasis.partner;
+      // partner exisitiert --> muss an den Anfang, damit die Schwerpunktbahnkurve in den Hintergrund rutscht
+      firstKeys.push(graphKey);
+    } catch (e) {
+      // keine Schwerpunktbahnkurve eingetragen --> an den Schluss anhängen
+      lastKeys.push(graphKey);
+    }
+  }
+  keysInRightOrder = firstKeys;
+  keysInRightOrder = keysInRightOrder.concat(lastKeys);
+  return keysInRightOrder;
+}
 function setup() {
   loadWithDefaults();
 }
@@ -203,6 +222,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
 
 
   let mainEmphasisCoords;
+  let mainGraphs = [];
   for (let graphKey in data) {
     let graph = data[graphKey];
     let emphasisPartner;
@@ -240,8 +260,12 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
     } catch (e) {
       emphasisPartner = undefined;
     }
-    drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined); // letzter Parameter hier eigentlich immer undefined --> vorherige andere Programmstruktur
+    mainGraphs.push([graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined]);
+    //drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined); // letzter Parameter hier eigentlich immer undefined --> vorherige andere Programmstruktur
   }
+  mainGraphs.forEach((item) => {
+    drawCoords(item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7]);
+  })
 }
 
 
