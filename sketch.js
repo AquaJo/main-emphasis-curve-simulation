@@ -209,7 +209,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
     let meCollection;
     let partnerCollection;
     try {
-      meCollection = [graph.x, graph.y]; // collections der Übersichts halber seperat setzen und übertragen
+      meCollection = [graph.x, graph.y]; // collections zur Übersicht seperat setzen und übertragen
       emphasisPartner = graph.config.emphasis.partner;
       partnerCollection = [data[emphasisPartner].x, data[emphasisPartner].y];
       // bis hier gekommen -> Schwerpunkbahn-Kords benötigt ... // zweifacher draw in einer for - iteration
@@ -234,6 +234,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
 
       drawConnectionLines(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined); // einfach selbes Schema wie aus vorherige Methode --> drawCoords() genommen, --> schnelles copy-pasting, auch wenn bis jz nicht alle infos gebraucht
       drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
+
 
 
     } catch (e) {

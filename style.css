@@ -233,9 +233,6 @@ canvas {
   border-color: rgb(33, 37, 41);
 }
 
-
-
-
 #createEmphasisCurve {
   position:absolute;
   z-index:4;
