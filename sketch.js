@@ -203,7 +203,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
 
 
   let mainEmphasisCoords;
-  for (let graphKey in data) { // zweifache for Schleife des selbigen Typs, da erst im Falle die Schwerpunktbahn-Kurve gezeichnet wird, damit diese in den Hintergrund rutscht, egal welches Object welchen Partner angegeben hat
+  for (let graphKey in data) {
     let graph = data[graphKey];
     let emphasisPartner;
     let meCollection;
@@ -233,7 +233,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
       }
 
       drawConnectionLines(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined); // einfach selbes Schema wie aus vorherige Methode --> drawCoords() genommen, --> schnelles copy-pasting, auch wenn bis jz nicht alle infos gebraucht
-      drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]);
+      drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]); // vor Graph-Koordinaten  Schwerpunktbahn zeichnen, damit diese nicht vor den anderen Graphen, Aber vor den weißen Verbindungslinien ist
 
 
 
@@ -243,6 +243,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
     drawCoords(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined);
   }
 }
+
 
 function drawAxes(smallestX, highestX, smallestY, highestY, a, offsetX, offsetY, step) {
   let newXS = a * smallestX + offsetX; // offset etc anwenden
