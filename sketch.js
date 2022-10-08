@@ -270,7 +270,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
 
 
 function drawAxes(smallestX, highestX, smallestY, highestY, a, offsetX, offsetY, step) {
-  let newXS = a * smallestX + offsetX; // offset etc anwenden
+  let newXS = a * smallestX + offsetX; // offset etc anwenden --> mögliche ungenutzte Zwischenräume ...
   let newYS = -a * smallestY + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
   let newXH = a * highestX + offsetX; // offset etc anwenden
   let newYH = -a * highestY + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
@@ -285,7 +285,7 @@ function drawAxes(smallestX, highestX, smallestY, highestY, a, offsetX, offsetY,
     line(newXS, y0, x0, y0);
   }
   if (highestY < 0) {
-    line(x0, newYH, x0, y0, x0);
+    line(x0, newYH, x0, y0);
   }
   if (smallestY > 0) {
     line(x0, newYS, x0, y0);
@@ -310,7 +310,7 @@ function drawAxes(smallestX, highestX, smallestY, highestY, a, offsetX, offsetY,
     }
     lineY += step;
   }
-  lineY = step;
+  lineY = -step;
   while (lineY > smallestY) { // positive y
     stroke(254, 44, 84);
     let newLineY = -a * lineY + offsetY;
