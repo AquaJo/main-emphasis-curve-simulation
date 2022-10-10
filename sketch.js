@@ -61,7 +61,7 @@ inputSwitch.addEventListener('input', (event) => {
   showWhite = !showWhite;
 });
 
-let uploadInput = document.getElementById("uploadInput");
+let uploadInput = document.getElementById("uploadInput"); // hätte auch nur einen verwenden können, habe aber im Vorhinein nicht gedacht gehabt, das Projekt derart weiterzuentwickeln
 // auf upload button click hören --> trigger file input
 document.getElementById("uploadCSV").addEventListener("click", () => {
   uploadInput.click();
@@ -77,12 +77,50 @@ async function handleFiles(event) { // auf file input hören
   }
   uploadInput.value = null;
 }
+
+let uploadInputImport = document.getElementById("uploadInputImport");
+// auf upload button click hören --> trigger file input
+
+uploadInputImport.addEventListener("change", handleFilesImport, false);
+async function handleFilesImport(event) { // auf file input hören
+  let jsonRaw = await readJSON(event.target.files[0]);
+  if (jsonRaw) {
+    try {
+      coordinates = JSON.parse(jsonRaw);
+      loadWithDefaults();
+    } catch {
+      alert("displaying failed!");
+    }
+  } else {
+    alert("file must be a JSON");
+  }
+  uploadInputImport.value = null;
+}
+
 let showAxes = true;
+function downloadAFile(text, name) {
+  const a = document.createElement('a');
+  const type = name.substring(name.lastIndexOf(".") + 1, name.length);
+  a.href = URL.createObjectURL(new Blob([text], { type: `text/${type === "txt" ? "plain" : type}` }));
+  a.download = name;
+  a.click();
+}
 document.addEventListener("keypress", function (event) {
   if (window.getComputedStyle(mainModal).display === "none") {
     if (event.key === "a") {
       showAxes = !showAxes;
       loadWithDefaults();
+    } else if (event.key === "e") { // für export
+      let pr = prompt("filename? (without domain)");
+      if (pr !== null) {
+        let name = pr;
+        if (name === "") {
+          name = "mecs-export";
+        }
+        downloadAFile(JSON.stringify(coordinates, undefined, 2), name + ".json");
+      }
+    } else if (event.key === "i") { // für import
+      uploadInputImport.click(); // handler in anderer, nicht anonymen Methode
     }
   }
 });
@@ -91,6 +129,24 @@ function readCSV(file) {
     // Überprüfen ob typ csv
     try {
       if (file.type && !file.type.startsWith('text/csv')) {
+        resolve(false);
+      }
+    } catch (e) {
+      resolve(false);
+    }
+
+    const reader = new FileReader(); // csv zu String überführen
+    reader.readAsText(file, "UTF-8")
+    reader.onload = function (evt) {
+      resolve(evt.target.result);
+    }
+  });
+}
+function readJSON(file) { // seperate methode, hätte auch eine Methode erstellen können im Vorhinein, mit 2. Paramter, der für die Dateiendung ist ...
+  return new Promise(resolve => { // Promise, da reader.onload async abläuft
+    // Überprüfen ob typ json
+    try {
+      if (file.type && !file.type.startsWith('application/json')) {
         resolve(false);
       }
     } catch (e) {
@@ -132,6 +188,7 @@ function CSVToArray(rawData, mode) {
 // P5JS - Syntax - Zeugs
 let zoomFactor = 100;
 let coordinates = presetCoordinates();
+
 function presetCoordinates() {
   let unsplittedKoords =
     "0,000;0,00;1,30;0,00;0,70* 0,050;-0,03;1,50;0,42;1,11* 0,100;0,12;1,53;0,72;1,60* 0,150;0,51;1,56;0,84;2,05* 0,200;1,03;1,76;0,88;2,34* 0,250;1,49;2,17;0,95;2,43* 0,300;1,74;2,66;1,18;2,43* 0,350;1,76;3,03;1,56;2,46* 0,400;1,71;3,16;2,00;2,63* 0,450;1,77;3,05;2,36;2,93* 0,500;2,07;2,87;2,55;3,23* 0,550;2,56;2,81;2,61;3,41* 0,600;3,07;2,96;2,65;3,39* 0,650;3,41;3,26;2,81;3,23* 0,700;3,51;3,52;3,14;3,05* 0,750;3,46;3,57;3,57;2,98* 0,800;3,46;3,36;3,98;3,06* 0,850;3,66;3,01;4,24;3,19* 0,900;4,09;2,70;4,33;3,25* 0,950;4,62;2,59;4,36;3,13* 1,000;5,04;2,67;4,46;2,83* 1,050;5,23;2,78;4,73;2,46* 1,100;5,23;2,75;5,14;2,16* 1,150;5,18;2,46;5,57;2,00* 1,200;5,29;1,95;5,89;1,94* 1,250;5,64;1,42;6,05;1,87* 1,300;6,15;1,04;6,09;1,64* 1,350;6,64;0,88;6,14;1,22* 1,400;6,92;0,82;6,34;0,68* 1,450;6,98;0,69;6,70;0,16"; // aus dem csv entnommen
