@@ -175,6 +175,48 @@ function CSVToArray(rawData, mode) {
 
 
 
+let focusedIndexInRangeI = -1;
+let graphNumFocusedIndexInRange = -1;
+document.addEventListener('mousemove', onMouseMover);
+function onMouseMover(event) { // dragging erkennen um Diagramm auf (relativer) Maus-Position zu halten
+  let absDif = 9;
+  let counter = 0;
+  for (let graphKey in coordinates) {
+    counter++;
+    let graph = coordinates[graphKey];
+
+    let xs = graph.x;
+    let ys = graph.y;
+    for (let i = 0; i < (xs.length > ys.length ? ys.length : xs.length); ++i) {
+      let xM = event.pageX;
+      let yM = event.pageY;
+      let a = zoomFactor;
+      let x = a * xs[i] + xOffset; // offset etc anwenden
+      let y = -a * ys[i] + yOffset; // - a , da y-k
+      let xDif = x - xM;
+      let yDif = y - yM + 25;
+      if ((xDif < absDif && xDif > -absDif) && (yDif < absDif && yDif > -absDif)) {
+        focusedIndexInRangeI = i;
+        graphNumFocusedIndexInRange = counter;
+        if (showWhite) {
+          console.log("shw");
+          showWhiteNow = true;
+          loadWithDefaults();
+        }
+        console.log("YYYY")
+      } else {
+        if (showWhiteNow && focusedIndexInRangeI == i && graphNumFocusedIndexInRange == counter) {
+          showWhiteNow = false;
+          loadWithDefaults();
+          focusedIndexInRangeI = -1;
+          graphNumFocusedIndexInRange = -1;
+          console.log("RESE")
+        }
+      }
+    }
+  }
+
+}
 
 
 
@@ -459,6 +501,27 @@ function drawConnectionLines(x, y, a, offsetX, offsetY, shape, color, othersCord
         let oY = othersCords[o][2][2];
         line(newX, newY, oA * othersCords[o][0][i] + oX, -oA * othersCords[o][1][i] + oY);
         noStroke();
+
+        // print angles (in beta testing)
+        //console.log("["+othersCords[o][1][i]+","+othersCords[o][0][i]+"]"+"["+y[i]+","+x[i]+"]"); // Vektoren der verbindenden nicht der zwei ? ... !
+
+        /*let angle = Math.atan2(othersCords[o][1][i], othersCords[o][0][i]) - atan2(y[i], x[i]); // atan2() berechnet Innenwinkel zwischen horizontaler X-Achse und der zugehörigen Strecke mit x,y und Ursprung 0,0
+        if (angle < 0) { angle += 2 * Math.PI; }*/
+
+        if (i > 0) {
+          //find vector components
+          var dAx = othersCords[o][0][i] - x[i];
+          var dAy = othersCords[o][1][i] - y[i];
+          var dBx = othersCords[o][0][i - 1] - x[i - 1];
+          var dBy = othersCords[o][1][i - 1] - y[i - 1];
+          var angle = Math.atan2(dAx * dBy - dAy * dBx, dAx * dBx + dAy * dBy);
+          if (angle < 0) { angle = angle * -1; }
+          var degree_angle = angle * (180 / Math.PI);
+          console.log(degree_angle);
+        }
+
+        //console.log("a in radian pi: " + angle);
+        //console.log("a in degree: " + (angle / (2 * Math.PI)) * 360);
       }
     }
   }
