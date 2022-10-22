@@ -8,7 +8,9 @@ Its documentation is on german, .. it was made as a school project in physics cl
 
 key - commands:
 hide/show axes -> type a
+
 export as json -> type e
+
 import from json -> type i
 
 Website-Link: https://aquajo.github.io/main-emphasis-curve-simulation/
