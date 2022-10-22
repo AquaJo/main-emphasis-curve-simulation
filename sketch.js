@@ -191,7 +191,7 @@ let focusedIndexInRangeI = -1; // global, da diese sich nicht bei jedem Graphen 
 let graphNumFocusedIndexInRange = -1; // ""
 document.addEventListener('mousemove', onMouseMover);
 function onMouseMover(event) {
-  let absDif = 9;
+  let absDif = 12;
 
   let xM = event.pageX;
   let yM = event.pageY;
