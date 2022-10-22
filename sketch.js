@@ -173,13 +173,29 @@ function CSVToArray(rawData, mode) {
 
 
 
-
-
-let focusedIndexInRangeI = -1;
-let graphNumFocusedIndexInRange = -1;
+function getEmphasisParterKey(myKey) {
+  for (let key in coordinates) {
+    try {
+      let graph = coordinates[key];
+      let partner = graph.config.emphasis.partner;
+      if (myKey == partner || myKey === key) {
+        return key;
+      }
+    } catch (e) {
+    }
+  }
+  return false;
+}
+// folgende Funktionen und Variablen um den Mouse-Cursor zu tracken, um zu checken ob dieser in der Nähe eines Punktes ist um Informationen zu diesem zB. Winkel zum vorherigen Vektor anzuzeigen
+let focusedIndexInRangeI = -1; // global, da diese sich nicht bei jedem Graphen resetten dürfen ...
+let graphNumFocusedIndexInRange = -1; // ""
 document.addEventListener('mousemove', onMouseMover);
-function onMouseMover(event) { // dragging erkennen um Diagramm auf (relativer) Maus-Position zu halten
+function onMouseMover(event) {
   let absDif = 9;
+
+  let xM = event.pageX;
+  let yM = event.pageY;
+
   let counter = 0;
   for (let graphKey in coordinates) {
     counter++;
@@ -187,37 +203,33 @@ function onMouseMover(event) { // dragging erkennen um Diagramm auf (relativer) 
 
     let xs = graph.x;
     let ys = graph.y;
-    for (let i = 0; i < (xs.length > ys.length ? ys.length : xs.length); ++i) {
-      let xM = event.pageX;
-      let yM = event.pageY;
+    for (let i = 0; i < (xs.length > ys.length ? ys.length : xs.length); ++i) { // jeden Punkt jenes Graphen durchleuchten und mit dem Cursor vergleichen
       let a = zoomFactor;
-      let x = a * xs[i] + xOffset; // offset etc anwenden
-      let y = -a * ys[i] + yOffset; // - a , da y-k
+      let x = a * xs[i] + xOffset;
+      let y = -a * ys[i] + yOffset;
       let xDif = x - xM;
       let yDif = y - yM + 25;
-      if ((xDif < absDif && xDif > -absDif) && (yDif < absDif && yDif > -absDif)) {
+      if ((xDif < absDif && xDif > -absDif) && (yDif < absDif && yDif > -absDif)) { // Differenzen zum Abstand zum jew. Punkt berechen und geg. Aktionen
         focusedIndexInRangeI = i;
         graphNumFocusedIndexInRange = counter;
         if (showWhite) {
-          console.log("shw");
-          showWhiteNow = true;
+          showWhiteNow = true; // normaler Weise, hier aber ein Array bestehend aus Graph-Kennzeichen/Key und i des Ausgangspunktes
+          showWhiteNow = [getEmphasisParterKey(graphKey), i];
           loadWithDefaults();
         }
-        console.log("YYYY")
       } else {
-        if (showWhiteNow && focusedIndexInRangeI == i && graphNumFocusedIndexInRange == counter) {
-          showWhiteNow = false;
+        if (showWhiteNow && focusedIndexInRangeI == i && graphNumFocusedIndexInRange == counter) { // wenn der selbe Graph mit betrachtetem Punkt & der Index der selbige ist --> reset Index(e) & reset Änderungen im Allg., die wieder verschwinden sollen
+          showWhiteNow = false; // wieder auf boolean setzen
           loadWithDefaults();
           focusedIndexInRangeI = -1;
           graphNumFocusedIndexInRange = -1;
-          console.log("RESE")
         }
       }
     }
   }
 
 }
-
+//
 
 
 
@@ -350,8 +362,7 @@ function load(cords, a, xOffset, yOffset, emphasisRelation, showConnectionLines,
           partnerCollection = [partnerCollection];
         }
       }
-
-      drawConnectionLines(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? partnerCollection : undefined); // einfach selbes Schema wie aus vorherige Methode --> drawCoords() genommen, --> schnelles copy-pasting, auch wenn bis jz nicht alle infos gebraucht
+      drawConnectionLines(graph.x, graph.y, a, xOffset, yOffset, graph.config.shape, graph.config.color, emphasisPartner !== undefined && showConnectionLines ? (typeof (showConnectionLines) === "boolean" ? partnerCollection : (showConnectionLines[0] === graphKey ? [partnerCollection, true, showConnectionLines[1]] : undefined)) : undefined); // einfach selbes Schema wie aus vorherige Methode --> drawCoords() genommen, --> schnelles copy-pasting, auch wenn bis jz nicht alle infos gebraucht
       drawCoords(mainEmphasisCoords[0], mainEmphasisCoords[1], a, xOffset, yOffset, "CIRCLE", [50, 205, 50]); // vor Graph-Koordinaten  Schwerpunktbahn zeichnen, damit diese nicht vor den anderen Graphen, Aber vor den weißen Verbindungslinien ist
 
 
@@ -489,7 +500,17 @@ function drawConnectionLines(x, y, a, offsetX, offsetY, shape, color, othersCord
   let w = 6; // w === Weite
   //let a = 100; // Streckung bestimmen
   let longest = x.length > y.length ? x.length : y.length;
-  for (let i = 0; i < longest; ++i) {
+  let startI = (othersCords !== undefined && othersCords.length == 3 && othersCords[1] === true ? (othersCords[2]-1)  : "all"); // herauslesen des Start Indexes (-1 --> vorheriger Vektor kommt mit) und "Berechnung End-Index"
+  let endI;
+  if (startI == "all") {
+    startI = 0;
+    endI = longest;
+  } else {
+    othersCords = othersCords[0];
+    if (startI < 0) startI = 0;
+    endI = startI+2;
+  }
+  for (let i = startI; i < endI; ++i) {
     let newX = a * x[i] + offsetX; // offset etc anwenden
     let newY = -a * y[i] + offsetY; // - a , da y-koord-achse gespiegelt ist  // a/(1+(offsetY/1000) damit y - offset doch relativ "unveränderlich" zur Streckung / Zoom-Faktor bleibt
     if (othersCords) { // Verbindungslinien zwischen den unterschiedlichen Kurven entstehend aus P und Q Koordinaten
@@ -519,9 +540,6 @@ function drawConnectionLines(x, y, a, offsetX, offsetY, shape, color, othersCord
           var degree_angle = angle * (180 / Math.PI);
           console.log(degree_angle);
         }
-
-        //console.log("a in radian pi: " + angle);
-        //console.log("a in degree: " + (angle / (2 * Math.PI)) * 360);
       }
     }
   }
