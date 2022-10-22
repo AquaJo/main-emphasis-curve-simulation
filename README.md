@@ -6,11 +6,9 @@ Its main feature however is to upload your own csv file, create graphs and main 
 
 Its documentation is on german, .. it was made as a school project in physics class.
 
-key - commands:
-hide/show axes -> type a
-
-export as json -> type e
-
-import from json -> type i
+*key - commands:*   \
+hide/show axes -> type a \
+export as json -> type e \
+import from json -> type i 
 
 Website-Link: https://aquajo.github.io/main-emphasis-curve-simulation/
