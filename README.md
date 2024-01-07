@@ -11,4 +11,4 @@ hide/show axes -> type a \
 export as json -> type e \
 import from json -> type i 
 
-Website-Link: https://aquajo.github.io/main-emphasis-curve-simulation/
+Website-Link: https://1221121.xyz/mainEmphasisCurveSimulation
